@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    	 version="3.0">
+	<display-name>Archetype Created Web Application</display-name>
+	<servlet>
+		<description>
+		</description>
+		<display-name>ComputerServlet</display-name>
+		<servlet-name>ComputerServlet</servlet-name>
+		<servlet-class>servlet.ComputerServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>AddComputerServlet</display-name>
+		<servlet-name>AddComputerServlet</servlet-name>
+		<servlet-class>servlet.AddComputerServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>EditComputerServlet</display-name>
+		<servlet-name>EditComputerServlet</servlet-name>
+		<servlet-class>servlet.EditComputerServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>DeleteComputerServlet</display-name>
+		<servlet-name>DeleteComputerServlet</servlet-name>
+		<servlet-class>servlet.DeleteComputerServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ComputerServlet</servlet-name>
+		<url-pattern>/ComputerServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AddComputerServlet</servlet-name>
+		<url-pattern>/AddComputerServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>EditComputerServlet</servlet-name>
+		<url-pattern>/EditComputerServlet</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DeleteComputerServlet</servlet-name>
+		<url-pattern>/DeleteComputerServlet</url-pattern>
+	</servlet-mapping>
+		
+</web-app>
