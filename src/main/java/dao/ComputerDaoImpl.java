@@ -269,4 +269,32 @@ public class ComputerDaoImpl implements ComputerDao {
         }
         return 0;
     }
+    
+    /**
+     * 
+     */
+    public List<Computer> sortByName(String search) throws SQLException {
+    	List<Computer> computers = new ArrayList<Computer>();
+        ResultSet resultat = null;
+        try ( Connection connexion = daoFactory.getConnection(); Statement statement = connexion.createStatement() ) {
+            resultat = statement.executeQuery(GETALL + " where name LIKE '%" + search + "%' LIMIT 50;");
+            CompanyDao cd = daoFactory.getCompanyDao();
+            while(resultat.next())
+            {
+                Integer id = resultat.getInt("id");
+                String name = resultat.getString("name");
+                Timestamp introduced = resultat.getTimestamp("introduced");
+                Timestamp discontinued = resultat.getTimestamp("discontinued");
+                int id_company = resultat.getInt("company_id");
+                
+                Computer c = new Computer(id,name,introduced,discontinued,cd.getCompany(id_company));
+                computers.add(c);
+            }
+            LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
+        } catch (SQLException e) {
+        	LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
+            e.printStackTrace();
+        }
+        return computers;
+    }
 }

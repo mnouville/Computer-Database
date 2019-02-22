@@ -68,4 +68,12 @@ public interface ComputerDao {
 	 * @throws SQLException
 	 */
 	void updateComputer(Computer c) throws SQLException;
+	
+	/**
+	 * Return a list of computers that contains in their name the following words
+	 * @param String search
+	 * @return List of Computer Objects
+	 * @throws SQLException
+	 */
+	List<Computer> sortByName(String search) throws SQLException;
 }
