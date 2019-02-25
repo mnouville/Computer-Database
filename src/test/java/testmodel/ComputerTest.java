@@ -11,8 +11,16 @@ import model.Computer;
 
 import org.junit.Test;
 
+/**
+ * Unit Test for Computer.java
+ * @author mnouville
+ * @version 1.0
+ */
 public class ComputerTest {
 
+  /**
+   * Method for testing equals Method of Company.java
+   */
   @Test
   public void testequals() throws ParseException {
     

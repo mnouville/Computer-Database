@@ -6,8 +6,16 @@ import model.Company;
 
 import org.junit.Test;
 
+/**
+ * Unit Test for Company.java
+ * @author mnouville
+ * @version 1.0
+ */
 public class CompanyTest {
 
+  /**
+   * Method for testing equals Method of Company.java
+   */
   @Test
   public void testequals() {
     Company c1 = new Company(1,"Company1");
