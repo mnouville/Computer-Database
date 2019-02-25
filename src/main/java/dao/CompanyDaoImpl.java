@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 public class CompanyDaoImpl implements CompanyDao {
 
   private DaoFactory daoFactory;
+  private static CompanyDaoImpl single_instance = null;
   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
@@ -40,6 +41,19 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   CompanyDaoImpl(DaoFactory daoFactory) {
     this.daoFactory = daoFactory;
+  }
+  
+  /**
+   * Return unique instance of CompanyDaoImpl.
+   * @return CompanyDaoImpl
+   */
+  public static CompanyDaoImpl getInstance() {
+    // Singleton
+    if (single_instance == null) {
+      single_instance = new CompanyDaoImpl(DaoFactory.getInstance());
+    }
+      
+    return single_instance;
   }
 
   /**

@@ -66,7 +66,7 @@ public class DaoFactory {
    * @return Object CompanyDao
    */
   public CompanyDao getCompanyDao() {
-    return new CompanyDaoImpl(this);
+    return CompanyDaoImpl.getInstance();
   }
 
   /**
@@ -75,6 +75,6 @@ public class DaoFactory {
    * @return Object ComputerDao
    */
   public ComputerDao getComputerDao() {
-    return new ComputerDaoImpl(this);
+    return ComputerDaoImpl.getInstance();
   }
 }
