@@ -1,4 +1,4 @@
-package test;
+package testdao;
 
 import static org.junit.Assert.assertEquals;
 

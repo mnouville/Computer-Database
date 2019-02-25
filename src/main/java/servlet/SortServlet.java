@@ -1,7 +1,5 @@
 package servlet;
 
-import dao.DaoFactory;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -27,8 +25,7 @@ public class SortServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    DaoFactory daoFactory = DaoFactory.getInstance();
-    this.serviceComputer = new ServiceComputerImpl(daoFactory);
+    this.serviceComputer = ServiceComputerImpl.getInstance();
   }
 
   /**

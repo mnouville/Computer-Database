@@ -1,7 +1,5 @@
 package servlet;
 
-import dao.DaoFactory;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -34,9 +32,8 @@ public class AddComputerServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    DaoFactory daoFactory = DaoFactory.getInstance();
-    this.serviceCompany = new ServiceCompanyImpl(daoFactory);
-    this.serviceComputer = new ServiceComputerImpl(daoFactory);
+    this.serviceCompany = ServiceCompanyImpl.getInstance();
+    this.serviceComputer = ServiceComputerImpl.getInstance();
   }
 
   /**

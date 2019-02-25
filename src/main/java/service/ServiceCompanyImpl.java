@@ -17,6 +17,7 @@ import model.Company;
 public class ServiceCompanyImpl implements ServiceCompany {
 
   private CompanyDao companyDao;
+  private static ServiceCompanyImpl single_instance = null;
 
   /**
    * Constructor of the class ServiceCompanyImpl.
@@ -25,6 +26,19 @@ public class ServiceCompanyImpl implements ServiceCompany {
    */
   public ServiceCompanyImpl(DaoFactory daoFactory) {
     this.companyDao = daoFactory.getCompanyDao();
+  }
+  
+  /**
+   * Return unique instance of ServiceCompanyImpl.
+   * @return ServiceCompanyImpl
+   */
+  public static ServiceCompanyImpl getInstance() {
+    // Singleton
+    if (single_instance == null) {
+      single_instance = new ServiceCompanyImpl(DaoFactory.getInstance());
+    }
+      
+    return single_instance;
   }
 
   /**

@@ -17,6 +17,7 @@ import model.Computer;
 public class ServiceComputerImpl implements ServiceComputer {
 
   private ComputerDao computerDao;
+  private static ServiceComputerImpl single_instance = null;
 
   /**
    * Constructor of the Class ServiceComputerImpl.
@@ -25,6 +26,19 @@ public class ServiceComputerImpl implements ServiceComputer {
    */
   public ServiceComputerImpl(DaoFactory daoFactory) {
     this.computerDao = daoFactory.getComputerDao();
+  }
+  
+  /**
+   * Return unique instance of ServiceCompanyImpl.
+   * @return ServiceCompanyImpl
+   */
+  public static ServiceComputerImpl getInstance() {
+    // Singleton
+    if (single_instance == null) {
+      single_instance = new ServiceComputerImpl(DaoFactory.getInstance());
+    }
+      
+    return single_instance;
   }
 
   /**
@@ -105,8 +119,12 @@ public class ServiceComputerImpl implements ServiceComputer {
     return this.computerDao.getCount();
   }
 
+  /**
+   * Method that list some computer sorted by name.
+   * @param search String
+   */
   @Override
   public List<Computer> sortByName(String search) throws SQLException {
-    return this.sortByName(search);
+    return this.computerDao.sortByName(search);
   }
 }

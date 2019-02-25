@@ -1,7 +1,5 @@
 package servlet;
 
-import dao.DaoFactory;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -32,9 +30,8 @@ public class EditComputerServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    DaoFactory daoFactory = DaoFactory.getInstance();
-    this.serviceComputer = new ServiceComputerImpl(daoFactory);
-    this.serviceCompany = new ServiceCompanyImpl(daoFactory);
+    this.serviceComputer = ServiceComputerImpl.getInstance();
+    this.serviceCompany = ServiceCompanyImpl.getInstance();
   }
 
   /**
@@ -46,6 +43,16 @@ public class EditComputerServlet extends HttpServlet {
     // TODO Auto-generated method stub
     int id = Integer.parseInt(request.getParameter("id"));
     request.setAttribute("idcomputer", id);
+    try {
+      Computer c = this.serviceComputer.getComputer(id);
+      request.setAttribute("name", c.getName());
+      request.setAttribute("introduced", c.getIntroduced());
+      request.setAttribute("discontinued", c.getDiscontinued());
+      request.setAttribute("companyid", c.getCompany().getId());
+    } catch (SQLException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
 
     try {
       List<Company> companies = this.serviceCompany.getCompanies();
