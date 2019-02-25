@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <profiles version="14">
     <profile kind="CodeFormatterProfile" name="eclipse-cs computer-database" version="14">
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_ellipsis" value="insert"/>

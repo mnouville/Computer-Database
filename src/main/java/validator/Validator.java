@@ -13,6 +13,11 @@ import org.slf4j.LoggerFactory;
 import service.ServiceCompany;
 import service.ServiceCompanyImpl;
 
+/**
+ * Class Validator.java
+ * @author mnouville
+ * @version 1.0
+ */
 public class Validator {
 
   private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
