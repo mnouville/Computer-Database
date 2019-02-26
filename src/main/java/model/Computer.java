@@ -206,6 +206,9 @@ public class Computer {
     return s;
   }
 
+  /**
+   * HashCode method for Computer Object.
+   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -218,37 +221,58 @@ public class Computer {
     return result;
   }
 
+  /**
+   * Equals Method for Computer Object.
+   */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     Computer other = (Computer) obj;
     if (company == null) {
-      if (other.company != null)
+      if (other.company != null) {
         return false;
-    } else if (!company.equals(other.company))
+      }
+    } else if (!company.equals(other.company)) {
       return false;
+    }
+      
     if (discontinued == null) {
-      if (other.discontinued != null)
+      if (other.discontinued != null) {
         return false;
-    } else if (!discontinued.equals(other.discontinued))
+      }
+    } else if (!discontinued.equals(other.discontinued)) {
       return false;
-    if (id != other.id)
+    }
+
+    if (id != other.id) {
       return false;
+    }
+    
     if (introduced == null) {
-      if (other.introduced != null)
+      if (other.introduced != null) {
         return false;
-    } else if (!introduced.equals(other.introduced))
+      }
+    } else if (!introduced.equals(other.introduced)) {
       return false;
+    }
+      
     if (name == null) {
-      if (other.name != null)
+      if (other.name != null) {
         return false;
-    } else if (!name.equals(other.name))
+      }
+        
+    } else if (!name.equals(other.name)) {
       return false;
+    }
+      
     return true;
   }
 }
