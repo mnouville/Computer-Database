@@ -79,10 +79,19 @@ public class EditComputerServlet extends HttpServlet {
       c.setName(request.getParameter("name"));
 
       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-      Date introduced = formatter.parse(request.getParameter("introduced"));
-      c.setIntroduced(introduced);
-      Date discontinued = formatter.parse(request.getParameter("discontinued"));
-      c.setDiscontinued(discontinued);
+      if (request.getParameter("introduced").equals("")) {
+        c.setIntroduced(null);
+      } else {
+        Date introduced = formatter.parse(request.getParameter("introduced"));
+        c.setIntroduced(introduced);
+      }
+      
+      if (request.getParameter("discontinued").equals("")) {
+        c.setDiscontinued(null);
+      } else {
+        Date discontinued = formatter.parse(request.getParameter("discontinued"));
+        c.setDiscontinued(discontinued);
+      }
 
       Company comp = this.serviceCompany
           .getCompany(Integer.parseInt(request.getParameter("companyid")));
