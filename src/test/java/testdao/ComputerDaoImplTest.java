@@ -13,6 +13,11 @@ import model.Computer;
 
 import org.junit.Test;
 
+import service.ServiceComputer;
+import service.ServiceComputerImpl;
+
+
+
 public class ComputerDaoImplTest {
 
   private DaoFactory daoFactory = DaoFactory.getInstance();
@@ -23,40 +28,35 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testAddComputer() throws SQLException {
-    Computer c = new Computer(575, "UnitTestComputer", null, null, new Company(1, "Apple Inc."));
-    ComputerDao cd = daoFactory.getComputerDao();
-    cd.addComputer(c);
-
-    List<Computer> computers = cd.getComputers();
-
-    Computer cc = cd.getComputer(574);
-    System.out.println(c.equals(cc));
-
+    
+    ServiceComputer serviceComputer = new ServiceComputerImpl(DaoFactory.getInstance());
+    Computer c = new Computer(1000, "UnitTestComputer", null, null, new Company(1, "Apple Inc."));
+    int c1 = serviceComputer.getCount();
+    serviceComputer.addComputer(c);
+    int c2 = serviceComputer.getCount();
+    System.out.println(c1 + " , " + c2);
     boolean b = false;
-    for (int i = 0; i < computers.size(); i++) {
-      if (computers.get(i).equals(c)) {
-        b = true;
-      }
+    
+    if (c1 < c2) {
+      b = true;
     }
+    
     assertEquals(true, b);
   }
 
   /**
    * JUnit test for deleting company.
-   * 
    */
   @Test
-  public void testDeleteCompany() throws SQLException {
+  public void testDeleteComputer() throws SQLException {
     ComputerDao cd = daoFactory.getComputerDao();
-    Computer c = cd.getComputer(575);
+    Computer c = cd.getComputer(1000);
     cd.deleteComputer(c.getId());
     List<Computer> computers = cd.getComputers();
 
     boolean b = false;
-    for (int i = 0; i < computers.size(); i++) {
-      if (computers.get(i).equals(c)) {
-        b = true;
-      }
+    if (computers.contains(c)) {
+      b = true;
     }
 
     assertEquals(false, b);

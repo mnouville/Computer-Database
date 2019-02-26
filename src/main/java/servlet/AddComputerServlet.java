@@ -65,7 +65,7 @@ public class AddComputerServlet extends HttpServlet {
     try {
       c.setId(this.serviceComputer.getMaxId());
       c.setName(request.getParameter("name"));
-
+      
       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
       Date introduced = formatter.parse(request.getParameter("introduced"));
       c.setIntroduced(introduced);
