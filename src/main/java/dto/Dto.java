@@ -7,7 +7,7 @@ import java.sql.SQLException;
  * @author mnouville
  * @version 1.0
  */
-public class CdbDto {
+public class Dto {
 
   private String id;
   private String name;
@@ -25,7 +25,7 @@ public class CdbDto {
    * @param companyid String
    * @param companyname String
    */
-  public CdbDto(String id, String name, String introduced, String discontinued, 
+  public Dto(String id, String name, String introduced, String discontinued, 
                 String companyid, String companyname) throws SQLException {
     this.id = id;
     this.name = name;

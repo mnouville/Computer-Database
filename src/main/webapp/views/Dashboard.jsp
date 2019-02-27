@@ -91,7 +91,7 @@
 	                        </td>
                             <td><c:out value="${c.introduced}" /></td>
                             <td><c:out value="${c.discontinued}" /></td>
-                            <td><c:out value="${c.company.name}" /></td>
+                            <td><c:out value="${c.companyname}" /></td>
                         </tr>
                     </c:forEach>
                 </tbody>
