@@ -1,14 +1,6 @@
 package dto;
 
-import dao.DaoFactory;
-
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
-import model.Company;
-import service.ServiceCompany;
-import service.ServiceCompanyImpl;
 
 /**
  * DTO for objects Company and Computers.
@@ -17,38 +9,37 @@ import service.ServiceCompanyImpl;
  */
 public class CdbDto {
 
-  private int id;
+  private String id;
   private String name;
-  private Date introduced;
-  private Date discontinued;
-  private Company company;
-  private List<Company> listCompany;
-  private ServiceCompany serviceCompany;
+  private String introduced;
+  private String discontinued;
+  private String companyid;
+  private String companyname;
   
   /**
    * Constructor of CdbDto class.
-   * @param id int
+   * @param id String
    * @param name String
-   * @param introduced Date
-   * @param discontinued Date
-   * @param c Company
+   * @param introduced String
+   * @param discontinued String
+   * @param companyid String
+   * @param companyname String
    */
-  public CdbDto(int id, String name, Date introduced, Date discontinued, Company c) 
-      throws SQLException {
+  public CdbDto(String id, String name, String introduced, String discontinued, 
+                String companyid, String companyname) throws SQLException {
     this.id = id;
     this.name = name;
     this.introduced = introduced;
     this.discontinued = discontinued;
-    this.company = c;
-    this.serviceCompany = new ServiceCompanyImpl(DaoFactory.getInstance());
-    this.listCompany = this.serviceCompany.getCompanies();
+    this.companyid = companyid;
+    this.setCompanyname(companyname);
   }
 
   /**
    * Getter of the class CdbDto.java
    * @return int
    */
-  public int getId() {
+  public String getId() {
     return id;
   }
 
@@ -56,7 +47,7 @@ public class CdbDto {
    * Setter of the class CdbDto.java
    * @param id int
    */
-  public void setId(int id) {
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -80,7 +71,7 @@ public class CdbDto {
    * Getter of the class CdbDto.java
    * @return Date
    */
-  public Date getIntroduced() {
+  public String getIntroduced() {
     return introduced;
   }
 
@@ -88,7 +79,7 @@ public class CdbDto {
    * Setter of the class CdbDto.java
    * @param introduced Date
    */
-  public void setIntroduced(Date introduced) {
+  public void setIntroduced(String introduced) {
     this.introduced = introduced;
   }
   
@@ -96,7 +87,7 @@ public class CdbDto {
    * Getter of the class CdbDto.java
    * @return Date
    */
-  public Date getDiscontinued() {
+  public String getDiscontinued() {
     return discontinued;
   }
 
@@ -104,56 +95,40 @@ public class CdbDto {
    * Setter of the class CdbDto.java
    * @param discontinued Date
    */
-  public void setDiscontinued(Date discontinued) {
+  public void setDiscontinued(String discontinued) {
     this.discontinued = discontinued;
   }
 
   /**
    * Getter of the class CdbDto.java
-   * @return Company
+   * @return String
    */
-  public Company getCompany() {
-    return company;
+  public String getCompanyId() {
+    return companyid;
   }
 
   /**
    * Setter of the class CdbDto.java
-   * @param company Company
+   * @param companyid String
    */
-  public void setCompany(Company company) {
-    this.company = company;
+  public void setCompanyId(String companyid) {
+    this.companyid = companyid;
   }
 
   /**
    * Getter of the class CdbDto.java
-   * @return List of Company
+   * @return String
    */
-  public List<Company> getListCompany() {
-    return listCompany;
+  public String getCompanyname() {
+    return companyname;
   }
 
   /**
    * Setter of the class CdbDto.java
-   * @param listCompany List
+   * @param companyname String
    */
-  public void setListCompany(List<Company> listCompany) {
-    this.listCompany = listCompany;
-  }
-
-  /**
-   * Getter of the class CdbDto.java
-   * @return ServiceCompany
-   */
-  public ServiceCompany getServiceCompany() {
-    return serviceCompany;
-  }
-
-  /**
-   * Setter of the class CdbDto.java
-   * @param serviceCompany ServiceCompany
-   */
-  public void setServiceCompany(ServiceCompany serviceCompany) {
-    this.serviceCompany = serviceCompany;
+  public void setCompanyname(String companyname) {
+    this.companyname = companyname;
   }
   
 }
