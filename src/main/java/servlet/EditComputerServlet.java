@@ -12,12 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import mappers.MapperDto;
 import model.Company;
 import model.Computer;
 import service.ServiceCompany;
 import service.ServiceCompanyImpl;
 import service.ServiceComputer;
 import service.ServiceComputerImpl;
+import validator.Validator;
 
 /**
  * Servlet implementation class EditComputerServlet.
@@ -27,11 +29,15 @@ public class EditComputerServlet extends HttpServlet {
 
   private ServiceComputer serviceComputer;
   private ServiceCompany serviceCompany;
+  private MapperDto mapper;
+  private Validator validator;
 
   @Override
   public void init() throws ServletException {
     this.serviceComputer = ServiceComputerImpl.getInstance();
     this.serviceCompany = ServiceCompanyImpl.getInstance();
+    this.mapper = new MapperDto();
+    this.validator = new Validator();
   }
 
   /**
@@ -93,15 +99,32 @@ public class EditComputerServlet extends HttpServlet {
         c.setDiscontinued(discontinued);
       }
 
-      Company comp = this.serviceCompany
-          .getCompany(Integer.parseInt(request.getParameter("companyid")));
+      
+      Company comp;
+      int companyid = Integer.parseInt(request.getParameter("companyid"));
+      if (companyid != 0 && this.validator.validCompanyId(companyid)) {
+        System.out.println("if");
+        comp = this.serviceCompany.getCompany(
+               Integer.parseInt(request.getParameter("companyid")));
+      } else {
+        System.out.println("else");
+        comp = new Company(companyid,"");
+      }
 
       c.setCompany(comp);
+      
+      if (!this.validator.validDates(c)) {
+        request.setAttribute("error", "invaliddates");
+      } else if (!this.validator.validName(c.getName())) {
+        request.setAttribute("error", "invalidname");
+      } else {
+        this.serviceComputer.updateComputer(c);
+      }
 
-      this.serviceComputer.updateComputer(c);
       int max = this.serviceComputer.getCount();
       request.setAttribute("maxcomputer", max);
-      request.setAttribute("computers", this.serviceComputer.getComputers());
+      request.setAttribute("computers", 
+                           this.mapper.computersToDtos(this.serviceComputer.getComputers()));
       this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,
           response);
     } catch (SQLException e) {

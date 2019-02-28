@@ -17,6 +17,7 @@
 		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
 		<jstl.version>1.2</jstl.version>
 		<mockito-core.version>2.10.0</mockito-core.version>
+		<jquery.version>3.3.1</jquery.version>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Computer-Database</groupId>
@@ -83,6 +84,11 @@
 			<artifactId>mockito-core</artifactId>
 			<version>${mockito-core.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.webjars</groupId>
+		    <artifactId>jquery</artifactId>
+		    <version>${jquery.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

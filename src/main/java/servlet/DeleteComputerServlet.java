@@ -1,5 +1,7 @@
 package servlet;
 
+import dto.Dto;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -9,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import model.Computer;
+import mappers.MapperDto;
 import service.ServiceComputer;
 import service.ServiceComputerImpl;
 
@@ -20,10 +22,12 @@ public class DeleteComputerServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   private ServiceComputer serviceComputer;
-
+  private MapperDto mapper;
+  
   @Override
   public void init() throws ServletException {
     this.serviceComputer = ServiceComputerImpl.getInstance();
+    this.mapper = new MapperDto();
   }
 
   /**
@@ -40,10 +44,10 @@ public class DeleteComputerServlet extends HttpServlet {
       for (int i = 0; i < parts.length; i++) {
         this.serviceComputer.deleteComputer(Integer.parseInt(parts[i]));
       }
-      List<Computer> computers = this.serviceComputer.getComputers();
+      List<Dto> dtos = this.mapper.computersToDtos(this.serviceComputer.getComputers());
       int max = this.serviceComputer.getCount();
       request.setAttribute("maxcomputer", max);
-      request.setAttribute("computers", computers);
+      request.setAttribute("computers", dtos);
     } catch (NumberFormatException | SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

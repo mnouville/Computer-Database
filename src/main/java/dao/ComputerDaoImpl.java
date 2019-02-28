@@ -83,7 +83,12 @@ public class ComputerDaoImpl implements ComputerDao {
         preparedStatement.setDate(4, null);
       }
 
-      preparedStatement.setInt(5, c.getCompany().getId());
+      if (c.getCompany().getId() == 0) {
+        preparedStatement.setNull(5, java.sql.Types.INTEGER);
+      } else {
+        preparedStatement.setInt(5, c.getCompany().getId());
+      }
+      
 
       preparedStatement.executeUpdate();
       LOG.info("Request succesfully executed (ADD COMPUTER)! ");
@@ -224,25 +229,42 @@ public class ComputerDaoImpl implements ComputerDao {
     } else {
       intro = "TIMESTAMP('" + new java.sql.Timestamp(c.getIntroduced().getTime()).toString() + "')";
     }
-      
+
     if (c.getDiscontinued() == null) {
       disc = "NULL";
     } else {
-      disc = "TIMESTAMP('" + new java.sql.Timestamp(c.getDiscontinued().getTime()).toString() 
-                           + "')";
-    }  
-
-    try (Connection connexion = daoFactory.getConnection();
-        PreparedStatement preparedStatement = connexion
-            .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
-                + intro + " ,discontinued = " + disc + ", company_id = " + c.getCompany().getId()
-                + " where id = " + c.getId() + ";");) {
-      preparedStatement.executeUpdate();
-      LOG.info("Request succesfully executed (UPDATE COMPUTER)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
+      disc = "TIMESTAMP('" + new java.sql.Timestamp(c.getDiscontinued().getTime()).toString()
+          + "')";
     }
+
+    if (c.getCompany().getId() == 0) {
+      try (Connection connexion = daoFactory.getConnection();
+          PreparedStatement preparedStatement = connexion
+              .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
+                  + intro + " ,discontinued = " + disc + ", company_id = NULL" + " where id = "
+                  + c.getId() + ";");) {
+        preparedStatement.executeUpdate();
+        LOG.info("Request succesfully executed (UPDATE COMPUTER)! ");
+      } catch (SQLException e) {
+        LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
+        e.printStackTrace();
+      }
+    } else {
+      try (Connection connexion = daoFactory.getConnection();
+          PreparedStatement preparedStatement = connexion
+              .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
+                  + intro + " ,discontinued = " + disc + ", company_id = " + c.getCompany().getId()
+                  + " where id = " + c.getId() + ";");) {
+        preparedStatement.executeUpdate();
+        LOG.info("Request succesfully executed (UPDATE COMPUTER)! ");
+      } catch (SQLException e) {
+        LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
+        e.printStackTrace();
+      }
+      ;
+    }
+    
+    
   }
 
   /**

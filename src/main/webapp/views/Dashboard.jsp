@@ -22,7 +22,7 @@
             <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
         </div>
     </header>
-
+	<c:out value="${error}" />
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
@@ -96,9 +96,6 @@
                     </c:forEach>
                 </tbody>
             </table>
-            
-            
-            
         </div>
     </section>
 
@@ -133,6 +130,15 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/dashboard.js"></script>
+<script>
+	$('#addComputer').click(function(){
+		jQuery(".error-message").append('<div class="messages error">Error message to be displayed</div>');
+	});
+
+	jQuery(document).ready (function(){
+	    jQuery(".error-message").append('<div class="messages error">Error message to be displayed</div>');
+	}); 
+</script>
 
 </body>
 </html>

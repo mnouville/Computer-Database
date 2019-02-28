@@ -4,8 +4,7 @@ import dao.DaoFactory;
 
 import java.sql.SQLException;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,19 @@ public class Validator {
     this.daoFactory = DaoFactory.getInstance();
     this.serviceCompany = new ServiceCompanyImpl(daoFactory);
   }
+  
+  /**
+   * Method for the validation of Computer Name.
+   * @param name String
+   * @return
+   */
+  public boolean validName(String name) {
+    if (name.equals("") || name == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 
   /**
    * Method for the validation of introduced Parameter.
@@ -35,14 +47,9 @@ public class Validator {
    * @return
    */
   public boolean validIntroduced(String introduced) {
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-    // Check if the value is a valid timestamp
-    try {
-      if (!introduced.equals("")) {
-        formatter.parse(introduced);
-      }
+    if (!introduced.equals("") && introduced != null) {
       return true;
-    } catch (ParseException e) {
+    } else {
       return false;
     }
   }
@@ -53,14 +60,9 @@ public class Validator {
    * @return
    */
   public boolean validDiscontinued(String discontinued) {
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-    // Check if the value is a valid timestamp
-    try {
-      if (!discontinued.equals("")) {
-        formatter.parse(discontinued);
-      }
+    if (!discontinued.equals("") && discontinued != null) {
       return true;
-    } catch (ParseException e) {
+    } else {
       return false;
     }
   }
@@ -81,6 +83,23 @@ public class Validator {
       }
     } catch (NumberFormatException nfe) {
       return false;
+    }
+  }
+  
+  /**
+   * Method for the validation of every elements of a computer.
+   * @param c Computer
+   * @return boolean
+   */
+  public boolean validDates(Computer c) {
+    if (c.getIntroduced() != null && c.getDiscontinued() != null) {
+      if (c.getIntroduced().before(c.getDiscontinued())) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
     }
   }
 }
