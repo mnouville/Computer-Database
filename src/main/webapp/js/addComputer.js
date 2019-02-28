@@ -32,9 +32,3 @@
 		return true;
 	});
 }(jQuery));
-
-function isValidDate(s) {
-	var bits = s.split('/');
-	var d = new Date(bits[2] + '/' + bits[1] + '/' + bits[0]);
-	return !!(d && (d.getMonth() + 1) == bits[1] && d.getDate() == Number(bits[0]));
-}
