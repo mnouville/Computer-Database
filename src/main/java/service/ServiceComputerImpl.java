@@ -124,7 +124,17 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param search String
    */
   @Override
-  public List<Computer> sortByName(String search) throws SQLException {
-    return this.computerDao.sortByName(search);
+  public List<Computer> searchName(String search) throws SQLException {
+    return this.computerDao.searchName(search);
+  }
+  
+  /**
+   * Method that list computers ordered by name.
+   * @param type String
+   * @param begin int
+   * @return List of computers
+   */
+  public List<Computer> sortByName(String type, int begin) throws SQLException {
+    return this.computerDao.sortByName(type, begin);
   }
 }

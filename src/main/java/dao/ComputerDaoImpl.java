@@ -313,12 +313,41 @@ public class ComputerDaoImpl implements ComputerDao {
   /**
    * Method that sort all computers by name.
    */
-  public List<Computer> sortByName(String search) throws SQLException {
+  public List<Computer> searchName(String search) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
     try (Connection connexion = daoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " where name LIKE '%" + search + "%' LIMIT 50;");
+      CompanyDao cd = daoFactory.getCompanyDao();
+      while (resultat.next()) {
+        Integer id = resultat.getInt("id");
+        String name = resultat.getString("name");
+        Timestamp introduced = resultat.getTimestamp("introduced");
+        Timestamp discontinued = resultat.getTimestamp("discontinued");
+        int idcompany = resultat.getInt("company_id");
+
+        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        computers.add(c);
+      }
+      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
+    } catch (SQLException e) {
+      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
+      e.printStackTrace();
+    }
+    return computers;
+  }
+  
+  /**
+   * Method that sort all computers by introduced.
+   */
+  public List<Computer> sortByName(String type, int begin) throws SQLException {
+    List<Computer> computers = new ArrayList<Computer>();
+    ResultSet resultat = null;
+    try (Connection connexion = daoFactory.getConnection();
+        Statement statement = connexion.createStatement()) {
+      resultat = statement.executeQuery(
+          getall + " order by name " + type + " LIMIT 50 OFFSET " + begin);
       CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");

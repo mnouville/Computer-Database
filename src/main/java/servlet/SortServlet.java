@@ -45,7 +45,7 @@ public class SortServlet extends HttpServlet {
       throws ServletException, IOException {
     try {
       String search = request.getParameter("search");
-      List<Computer> computers = this.serviceComputer.sortByName(search);
+      List<Computer> computers = this.serviceComputer.searchName(search);
       request.setAttribute("computers", computers);
       request.setAttribute("maxcomputer", computers.size());
     } catch (SQLException e) {

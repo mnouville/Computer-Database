@@ -77,5 +77,13 @@ public interface ComputerDao {
    * @param search String
    * @return List of Computer Objects
    */
-  List<Computer> sortByName(String search) throws SQLException;
+  List<Computer> searchName(String search) throws SQLException;
+  
+  /**
+   * Return a list of computers ordered by name.
+   * @param type String
+   * @param begin int
+   * @return
+   */
+  List<Computer> sortByName(String type, int begin) throws SQLException;
 }

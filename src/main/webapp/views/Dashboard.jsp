@@ -17,12 +17,14 @@
 <link href="css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
+
+	<c:set var="sort" value="${param['sort']}" scope="application"></c:set>
+	
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
         </div>
     </header>
-	<c:out value="${error}" />
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
@@ -63,7 +65,14 @@
                             </span>
                         </th>
                         <th>
-                            Computer name
+                        	<c:choose>
+				            	<c:when test="${param['type'] == null}">
+									<a href="SortByName?page=${param['page']}&type=ASC&sort=name">Computer name</a>
+								</c:when>
+								<c:otherwise>
+									<a href="SortByName?page=${param['page']}&type=${type}&sort=name">Computer name</a>
+								</c:otherwise>
+			            	</c:choose>
                         </th>
                         <th>
                             Introduced date
@@ -112,7 +121,12 @@
 	            	<c:choose>
 		            	<c:when test="${i % 50 == 0}">
 		            		<c:set var="page" value="${page + 1}" scope="page"/>
-							<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li>
+		            		<c:choose>
+		            			<c:when test="${sort == 'name'}">
+		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value='${type}'/>&sort=name"><c:out value="${page}"/></a></li>
+		            			</c:when>
+		            		</c:choose>
+<%-- 							<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li> --%>
 						</c:when>
 	            	</c:choose>
 				</c:forEach>
