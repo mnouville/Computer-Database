@@ -123,7 +123,7 @@
 		            		<c:set var="page" value="${page + 1}" scope="page"/>
 		            		<c:choose>
 		            			<c:when test="${sort == 'name'}">
-		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value='${type}'/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            		</c:choose>
 <%-- 							<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li> --%>
