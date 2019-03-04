@@ -84,4 +84,12 @@ public interface ServiceComputer {
    * @return List of computers
    */
   List<Computer> sortByName(String type, int begin) throws SQLException;
+  
+  /**
+   * Return a list of computers ordered by Introduced.
+   * @param type String
+   * @param begin int
+   * @return
+   */
+  List<Computer> sortByIntro(String type, int begin) throws SQLException;
 }

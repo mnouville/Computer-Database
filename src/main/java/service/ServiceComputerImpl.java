@@ -137,4 +137,14 @@ public class ServiceComputerImpl implements ServiceComputer {
   public List<Computer> sortByName(String type, int begin) throws SQLException {
     return this.computerDao.sortByName(type, begin);
   }
+  
+  /**
+   * Method that list computers ordered by Introduced.
+   * @param type String
+   * @param begin int
+   * @return List of computers
+   */
+  public List<Computer> sortByIntro(String type, int begin) throws SQLException {
+    return this.computerDao.sortByIntro(type, begin);
+  }
 }

@@ -75,17 +75,37 @@
 			            	</c:choose>
                         </th>
                         <th>
-                            Introduced date
+                        	<c:choose>
+				            	<c:when test="${param['type'] == null}">
+									<a href="SortByIntro?page=${param['page']}&type=ASC&sort=name">Introduced date</a>
+								</c:when>
+								<c:otherwise>
+									<a href="SortByIntro?page=${param['page']}&type=${type}&sort=name">Introduced date</a>
+								</c:otherwise>
+			            	</c:choose>
                         </th>
                         <!-- Table header for Discontinued Date -->
                         <th>
-                            Discontinued date
+                        	<c:choose>
+				            	<c:when test="${param['type'] == null}">
+									<a href="SortByDisc?page=${param['page']}&type=ASC&sort=name">Discontinued date</a>
+								</c:when>
+								<c:otherwise>
+									<a href="SortByDisc?page=${param['page']}&type=${type}&sort=name">Discontinued date</a>
+								</c:otherwise>
+			            	</c:choose>
                         </th>
                         <!-- Table header for Company -->
                         <th>
-                            Company
+                           	<c:choose>
+				            	<c:when test="${param['type'] == null}">
+									<a href="SortByCompany?page=${param['page']}&type=ASC&sort=name">Discontinued date</a>
+								</c:when>
+								<c:otherwise>
+									<a href="SortByCompany?page=${param['page']}&type=${type}&sort=name">Discontinued date</a>
+								</c:otherwise>
+			            	</c:choose>
                         </th>
-
                     </tr>
                 </thead>
                 <!-- Browse attribute computers -->
@@ -125,8 +145,16 @@
 		            			<c:when test="${sort == 'name'}">
 		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
+		            			<c:when test="${sort == 'intro'}">
+		            				<li><a href="SortByIntro?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            			</c:when>
+		            			<c:when test="${sort == 'disc'}">
+		            				<li><a href="SortByDisc?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            			</c:when>
+		            			<c:when test="${sort == 'company'}">
+		            				<li><a href="SortByCompany?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            			</c:when>
 		            		</c:choose>
-<%-- 							<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li> --%>
 						</c:when>
 	            	</c:choose>
 				</c:forEach>

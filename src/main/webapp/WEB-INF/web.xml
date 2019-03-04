@@ -46,6 +46,13 @@
 		<servlet-name>SortByName</servlet-name>
 		<servlet-class>servlet.SortByName</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>SortByIntro</display-name>
+		<servlet-name>SortByIntro</servlet-name>
+		<servlet-class>servlet.SortByIntro</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>ComputerServlet</servlet-name>
 		<url-pattern>/ComputerServlet</url-pattern>
@@ -69,6 +76,10 @@
 	<servlet-mapping>
 		<servlet-name>SortByName</servlet-name>
 		<url-pattern>/SortByName</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SortByIntro</servlet-name>
+		<url-pattern>/SortByIntro</url-pattern>
 	</servlet-mapping>
 	
 	
