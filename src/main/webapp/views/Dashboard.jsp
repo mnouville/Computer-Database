@@ -77,10 +77,10 @@
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByIntro?page=${param['page']}&type=ASC&sort=name">Introduced date</a>
+									<a href="SortByIntro?page=${param['page']}&type=ASC&sort=intro">Introduced date</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByIntro?page=${param['page']}&type=${type}&sort=name">Introduced date</a>
+									<a href="SortByIntro?page=${param['page']}&type=${type}&sort=intro">Introduced date</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -88,10 +88,10 @@
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByDisc?page=${param['page']}&type=ASC&sort=name">Discontinued date</a>
+									<a href="SortByDisc?page=${param['page']}&type=ASC&sort=disc">Discontinued date</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByDisc?page=${param['page']}&type=${type}&sort=name">Discontinued date</a>
+									<a href="SortByDisc?page=${param['page']}&type=${type}&sort=disc">Discontinued date</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -99,10 +99,10 @@
                         <th>
                            	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByCompany?page=${param['page']}&type=ASC&sort=name">Discontinued date</a>
+									<a href="SortByCompany?page=${param['page']}&type=ASC&sort=name">Company</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByCompany?page=${param['page']}&type=${type}&sort=name">Discontinued date</a>
+									<a href="SortByCompany?page=${param['page']}&type=${type}&sort=name">Company</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>

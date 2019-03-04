@@ -94,4 +94,12 @@ public interface ComputerDao {
    * @return
    */
   List<Computer> sortByIntro(String type, int begin) throws SQLException;
+  
+  /**
+   * Return a list of computers ordered by Discontinued.
+   * @param type String
+   * @param begin int
+   * @return
+   */
+  List<Computer> sortByDisc(String type, int begin) throws SQLException;
 }
