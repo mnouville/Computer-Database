@@ -110,7 +110,7 @@ public class CompanyDaoImpl implements CompanyDao {
   @Override
   public void deleteCompany(int id) throws SQLException {    
     
-    /*try (Connection connect = DaoFactory.getConnection();
+    try (Connection connect = DaoFactory.getConnection();
         PreparedStatement statementComputers = 
             connect.prepareStatement("DELETE FROM COMPUTER WHERE company_id = " + id);
         PreparedStatement statementCompany = 
@@ -128,7 +128,7 @@ public class CompanyDaoImpl implements CompanyDao {
       }
     } catch (SQLException e) {
       LOG.warn(e.getMessage(), e);
-    }*/
+    }
   }
 
   /**
