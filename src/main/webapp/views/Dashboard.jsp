@@ -154,6 +154,9 @@
 		            			<c:when test="${sort == 'company'}">
 		            				<li><a href="SortByCompanyName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
+		            			<c:otherwise>
+		            				<li><a href="ComputerServlet?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            			</c:otherwise>	
 		            		</c:choose>
 						</c:when>
 	            	</c:choose>
