@@ -1,64 +1,61 @@
 package dao;
 
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This class instantiante the connection with the database.
+ * This class instantiate the connection with the database.
  * 
  * @author mnouville
  * @version 1.0
  */
 public class DaoFactory {
-  private String url;
-  private String username;
-  private String password;
-  // Singleton
-  private static DaoFactory single_instance = null;
+  private static HikariDataSource dataSource = new HikariDataSource();
+  
+  private static DaoFactory instance = new DaoFactory();
+  
+  private Logger logger = LoggerFactory.getLogger(DaoFactory.class);
 
-  /**
-   * Constructor of DaoFactory.
-   * 
-   * @param url of the database
-   * @param username String
-   * @param password String
-   */
-  DaoFactory(String url, String username, String password) {
-    this.url = url;
-    this.username = username;
-    this.password = password;
+  private DaoFactory() {
+    Properties connectionProps = new Properties();
+    try {
+      connectionProps.load(new FileInputStream(
+              Thread.currentThread().getContextClassLoader().getResource("").getPath()
+              + "hikariconfig.properties"));
+      dataSource.setJdbcUrl(connectionProps.getProperty("URL"));
+      dataSource.setUsername(connectionProps.getProperty("USERNAME"));
+      dataSource.setPassword(connectionProps.getProperty("PASSWORD"));
+      dataSource.setDriverClassName(connectionProps.getProperty("DRIVER"));
+    } catch (IOException e) {
+      logger.error(e.getMessage(), e);
+    }
   }
-
+  
   /**
-   * Return a unique database instance.
-   * 
-   * @return an Object DaoFactory
+   * Method get Instance.
+   * @return the DAOFactory
    */
   public static DaoFactory getInstance() {
-    try {
-      Class.forName("com.mysql.jdbc.Driver");
-    } catch (ClassNotFoundException e) {
-      System.out.println(e.toString());
-    }
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new DaoFactory(
-          "jdbc:mysql://localhost:3306/computer-database-db?autoReconnect=true&useSSL=false",
-          "admincdb", "qwerty1234");
-    }
-      
-    return single_instance;
+    return instance;
   }
-
+  
   /**
-   * This method launch the connection to the database.
-   * 
-   * @return Object Connection
+   * Method get Connection.
+   * @return the connection to the database
+   * @throws SQLException thrown if a problem occur during the communication
    */
-  public Connection getConnection() throws SQLException {
-    return DriverManager.getConnection(url, username, password);
+  public static Connection getConnection() throws SQLException {
+    return dataSource.getConnection();
   }
+  
 
   /**
    * This method return a CompanyDao.

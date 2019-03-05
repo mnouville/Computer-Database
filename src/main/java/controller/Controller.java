@@ -109,6 +109,9 @@ public class Controller {
           this.getView().printTableDatabase(table);
           launchMenuCompany();
           break;
+        case DELETE:
+          deleteCompany();
+          break;
         case EXIT:
           launchMenu();
           break;
@@ -120,6 +123,18 @@ public class Controller {
       this.getView().errorCommand();
       launchMenuCompany();
     }
+  }
+  
+  /**
+   * Method that display in console the delete menu for companies.
+   */
+  public void deleteCompany() throws SQLException {
+    System.out.print("Enter Company ID : ");
+    Scanner sc = new Scanner(System.in);
+    int companyid = Integer.parseInt(sc.nextLine());
+    this.serviceCompany.deleteCompany(companyid);
+    launchMenuCompany();
+    sc.close();
   }
 
   /**

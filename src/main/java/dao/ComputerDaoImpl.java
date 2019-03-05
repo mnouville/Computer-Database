@@ -69,7 +69,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void addComputer(Computer c) throws SQLException {
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
       preparedStatement.setInt(1, c.getId());
       preparedStatement.setString(2, c.getName());
@@ -110,7 +110,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> getComputers() throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " LIMIT 50;");
       CompanyDao cd = daoFactory.getCompanyDao();
@@ -142,7 +142,7 @@ public class ComputerDaoImpl implements ComputerDao {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
 
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " LIMIT 50 OFFSET " + begin);
       CompanyDao cd = daoFactory.getCompanyDao();
@@ -171,7 +171,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void deleteComputer(int id) throws SQLException {
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(delete + id)) {
       preparedStatement.executeUpdate();
       LOG.info("Request succesfully executed (DELETE COMPUTERS)! ");
@@ -192,7 +192,7 @@ public class ComputerDaoImpl implements ComputerDao {
     Computer c = new Computer();
     ResultSet resultat = null;
 
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
 
       resultat = statement.executeQuery(get + i + ";");
@@ -241,7 +241,7 @@ public class ComputerDaoImpl implements ComputerDao {
     }
 
     if (c.getCompany().getId() == 0) {
-      try (Connection connexion = daoFactory.getConnection();
+      try (Connection connexion = DaoFactory.getConnection();
           PreparedStatement preparedStatement = connexion
               .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
                   + intro + " ,discontinued = " + disc + ", company_id = NULL" + " where id = "
@@ -253,7 +253,7 @@ public class ComputerDaoImpl implements ComputerDao {
         e.printStackTrace();
       }
     } else {
-      try (Connection connexion = daoFactory.getConnection();
+      try (Connection connexion = DaoFactory.getConnection();
           PreparedStatement preparedStatement = connexion
               .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
                   + intro + " ,discontinued = " + disc + ", company_id = " + c.getCompany().getId()
@@ -278,7 +278,7 @@ public class ComputerDaoImpl implements ComputerDao {
   @Override
   public int getMaxId() throws SQLException {
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(maxid);
       if (resultat.next()) {
@@ -299,7 +299,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   public int getCount() throws SQLException {
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(count);
       if (resultat.next()) {
@@ -319,7 +319,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> searchName(String search) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " where name LIKE '%" + search + "%' LIMIT 50;");
       CompanyDao cd = daoFactory.getCompanyDao();
@@ -347,7 +347,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByName(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by name " + type + " LIMIT 50 OFFSET " + begin);
@@ -377,7 +377,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByIntro(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by introduced " + type + " LIMIT 50 OFFSET " + begin);
@@ -407,7 +407,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByDisc(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by discontinued " + type + " LIMIT 50 OFFSET " + begin);
@@ -437,7 +437,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByCompanyName(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           sortcompanyname + "order by comp.name " + type + " LIMIT 50 OFFSET " + begin);

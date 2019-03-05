@@ -30,7 +30,6 @@ public class CompanyDaoImpl implements CompanyDao {
   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
-  private final String delete = "DELETE FROM company WHERE id = ";
   private final String get = "SELECT id,name FROM company where id =";
   private final String count = "SELECT COUNT(*) from company where id =";
 
@@ -40,7 +39,7 @@ public class CompanyDaoImpl implements CompanyDao {
    * @param daoFactory DaoFactory
    */
   CompanyDaoImpl(DaoFactory daoFactory) {
-    this.daoFactory = daoFactory;
+    this.setDaoFactory(daoFactory);
   }
   
   /**
@@ -63,7 +62,7 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   @Override
   public void addCompany(Company c) throws SQLException {
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
       preparedStatement.setInt(1, c.getId());
       preparedStatement.setString(2, c.getName());
@@ -84,7 +83,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public List<Company> getCompanies() throws SQLException {
     List<Company> companies = new ArrayList<Company>();
     ResultSet resultat = null;
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall);
 
@@ -109,15 +108,27 @@ public class CompanyDaoImpl implements CompanyDao {
    * @param id int
    */
   @Override
-  public void deleteCompany(int id) throws SQLException {
-    try (Connection connexion = daoFactory.getConnection();
-        PreparedStatement preparedStatement = connexion.prepareStatement(delete + id)) {
-      preparedStatement.executeUpdate();
-      LOG.info("Request succesfully executed (DELETE COMPANY)! ");
+  public void deleteCompany(int id) throws SQLException {    
+    
+    /*try (Connection connect = DaoFactory.getConnection();
+        PreparedStatement statementComputers = 
+            connect.prepareStatement("DELETE FROM COMPUTER WHERE company_id = " + id);
+        PreparedStatement statementCompany = 
+            connect.prepareStatement("DELETE FROM COMPANY WHERE id = " + id)) {
+      try {
+        connect.setAutoCommit(false);
+        statementComputers.execute();
+        LOG.info("The statement " + statementComputers + " has been executed.");
+        statementCompany.execute();
+        LOG.info("The statement " + statementCompany + " has been executed.");
+        connect.commit();
+      } catch (SQLException e) {
+        LOG.error(e.getMessage(), e);
+        connect.rollback();
+      }
     } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
-    }
+      LOG.warn(e.getMessage(), e);
+    }*/
   }
 
   /**
@@ -131,7 +142,7 @@ public class CompanyDaoImpl implements CompanyDao {
     Company c = new Company();
     ResultSet resultat = null;
 
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(get + i + ";");
       while (resultat.next()) {
@@ -157,7 +168,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public boolean companyExist(int id) throws SQLException {
     ResultSet resultat = null;
 
-    try (Connection connexion = daoFactory.getConnection();
+    try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(count + id + ";");
 
@@ -175,5 +186,13 @@ public class CompanyDaoImpl implements CompanyDao {
       e.printStackTrace();
     }
     return false;
+  }
+
+  public DaoFactory getDaoFactory() {
+    return daoFactory;
+  }
+
+  public void setDaoFactory(DaoFactory daoFactory) {
+    this.daoFactory = daoFactory;
   }
 }
