@@ -38,7 +38,7 @@ public class ComputerDaoImpl implements ComputerDao {
   private final String count = "SELECT COUNT(id) FROM computer;";
   private final String sortcompanyname = "SELECT c.id,c.name,c.introduced,c.discontinued,"
                                        + "c.company_id FROM computer c" 
-                                       + " inner join company comp on c.company_id = comp.id ";
+                                       + " LEFT JOIN company comp on c.company_id = comp.id ";
 
   /**
    * Constructor of ComputerDaoImpl.

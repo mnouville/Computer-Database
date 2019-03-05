@@ -37,7 +37,6 @@ public class SortByCompanyName extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     // TODO Auto-generated method stub
-    System.out.println("debug 1");
     int page;
     if (request.getParameter("page").equals("")) {
       page = 1;
@@ -48,13 +47,11 @@ public class SortByCompanyName extends HttpServlet {
     try {
       int max = this.serviceComputer.getCount();
       int offset = (page - 1) * 50;
-      request.setAttribute("maxcomputer", max);
       List<Computer> computers;
       List<Dto> dtos;
       computers = this.serviceComputer.sortByCompanyName(request.getParameter("type"), offset);
       dtos = this.mapper.computersToDtos(computers);
-      
-      System.out.println("debug 2");
+      request.setAttribute("maxcomputer", max);
       request.setAttribute("sort", "company");
       request.setAttribute("computers", dtos);
     } catch (SQLException ex) {
@@ -66,7 +63,6 @@ public class SortByCompanyName extends HttpServlet {
     } else {
       request.setAttribute("type", "ASC");
     }
-    System.out.println("debug 3");
     this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,
         response);
     
