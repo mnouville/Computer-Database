@@ -100,4 +100,12 @@ public interface ServiceComputer {
    * @return
    */
   List<Computer> sortByDisc(String type, int begin) throws SQLException;
+  
+  /**
+   * Return a list of computers ordered by Company Name.
+   * @param type String
+   * @param begin int
+   * @return
+   */
+  List<Computer> sortByCompanyName(String type, int begin) throws SQLException;
 }

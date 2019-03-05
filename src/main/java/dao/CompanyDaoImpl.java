@@ -139,7 +139,7 @@ public class CompanyDaoImpl implements CompanyDao {
         String name = resultat.getString("name");
         c = new Company(id, name);
       }
-      LOG.info("Request succesfully executed (GET COMPANY)! ");
+      //LOG.info("Request succesfully executed (GET COMPANY)! ");
     } catch (SQLException e) {
       LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
       e.printStackTrace();

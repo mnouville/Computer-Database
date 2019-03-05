@@ -36,6 +36,9 @@ public class ComputerDaoImpl implements ComputerDao {
                            + "FROM computer where id =";
   private final String maxid = "SELECT MAX(id) FROM computer;";
   private final String count = "SELECT COUNT(id) FROM computer;";
+  private final String sortcompanyname = "SELECT c.id,c.name,c.introduced,c.discontinued,"
+                                       + "c.company_id FROM computer c" 
+                                       + " inner join company comp on c.company_id = comp.id ";
 
   /**
    * Constructor of ComputerDaoImpl.
@@ -339,7 +342,7 @@ public class ComputerDaoImpl implements ComputerDao {
   }
   
   /**
-   * Method that sort all computers by introduced.
+   * Method that sort all computers by Name.
    */
   public List<Computer> sortByName(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
@@ -359,7 +362,8 @@ public class ComputerDaoImpl implements ComputerDao {
         Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
         computers.add(c);
       }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
+      LOG.info("Request succesfully executed "
+          + "(GET ALL COMPUTERS SORTED BY NAME " + type + ")!");
     } catch (SQLException e) {
       LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
       e.printStackTrace();
@@ -388,7 +392,8 @@ public class ComputerDaoImpl implements ComputerDao {
         Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
         computers.add(c);
       }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
+      LOG.info("Request succesfully executed "
+          + "(GET ALL COMPUTERS SORTED BY INTRODUCED " + type + ")!");
     } catch (SQLException e) {
       LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
       e.printStackTrace();
@@ -417,7 +422,38 @@ public class ComputerDaoImpl implements ComputerDao {
         Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
         computers.add(c);
       }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
+      LOG.info("Request succesfully executed "
+             + "(GET ALL COMPUTERS SORTED BY DISCONTINUED " + type + ")!");
+    } catch (SQLException e) {
+      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
+      e.printStackTrace();
+    }
+    return computers;
+  }
+  
+  /**
+   * Method that sort all computers by Company Name.
+   */
+  public List<Computer> sortByCompanyName(String type, int begin) throws SQLException {
+    List<Computer> computers = new ArrayList<Computer>();
+    ResultSet resultat = null;
+    try (Connection connexion = daoFactory.getConnection();
+        Statement statement = connexion.createStatement()) {
+      resultat = statement.executeQuery(
+          sortcompanyname + "order by comp.name " + type + " LIMIT 50 OFFSET " + begin);
+      CompanyDao cd = daoFactory.getCompanyDao();
+      while (resultat.next()) {
+        Integer id = resultat.getInt("id");
+        String name = resultat.getString("name");
+        Timestamp introduced = resultat.getTimestamp("introduced");
+        Timestamp discontinued = resultat.getTimestamp("discontinued");
+        int idcompany = resultat.getInt("company_id");
+
+        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        computers.add(c);
+      }
+      LOG.info("Request succesfully executed "
+             + "(GET ALL COMPUTERS SORTED BY COMPANY NAME " + type + ")! ");
     } catch (SQLException e) {
       LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
       e.printStackTrace();

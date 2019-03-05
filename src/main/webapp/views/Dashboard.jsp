@@ -99,10 +99,10 @@
                         <th>
                            	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByCompany?page=${param['page']}&type=ASC&sort=name">Company</a>
+									<a href="SortByCompanyName?page=${param['page']}&type=ASC&sort=name">Company</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByCompany?page=${param['page']}&type=${type}&sort=name">Company</a>
+									<a href="SortByCompanyName?page=${param['page']}&type=${type}&sort=name">Company</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -152,7 +152,7 @@
 		            				<li><a href="SortByDisc?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'company'}">
-		            				<li><a href="SortByCompany?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="SortByCompanyName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            		</c:choose>
 						</c:when>

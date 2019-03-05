@@ -60,6 +60,13 @@
 		<servlet-name>SortByDisc</servlet-name>
 		<servlet-class>servlet.SortByDisc</servlet-class>
 	</servlet>
+	<servlet>
+		<description>
+		</description>
+		<display-name>SortByCompanyName</display-name>
+		<servlet-name>SortByCompanyName</servlet-name>
+		<servlet-class>servlet.SortByCompanyName</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>ComputerServlet</servlet-name>
 		<url-pattern>/ComputerServlet</url-pattern>
@@ -91,6 +98,10 @@
 	<servlet-mapping>
 		<servlet-name>SortByDisc</servlet-name>
 		<url-pattern>/SortByDisc</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SortByCompanyName</servlet-name>
+		<url-pattern>/SortByCompanyName</url-pattern>
 	</servlet-mapping>
 	
 	
