@@ -112,9 +112,9 @@ public class CompanyDaoImpl implements CompanyDao {
     
     try (Connection connect = DaoFactory.getConnection();
         PreparedStatement statementComputers = 
-            connect.prepareStatement("DELETE FROM COMPUTER WHERE company_id = " + id);
+            connect.prepareStatement("DELETE FROM computer WHERE company_id = " + id);
         PreparedStatement statementCompany = 
-            connect.prepareStatement("DELETE FROM COMPANY WHERE id = " + id)) {
+            connect.prepareStatement("DELETE FROM company WHERE id = " + id)) {
       try {
         connect.setAutoCommit(false);
         statementComputers.execute();

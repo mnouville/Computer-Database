@@ -12,6 +12,12 @@
     </appender>
 
     <logger name="LogController" level="TRACE"/>
+    <logger name="com.zaxxer.hikari.pool.PoolBase" level="ERROR"/>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="ERROR"/>
+    <logger name="com.zaxxer.hikari.HikariDataSource" level="ERROR"/>
+     <logger name="com.zaxxer.hikari">
+            <level value="error"/>
+        </logger>
 
     <root level="debug">
     <appender-ref ref="FILE" />
