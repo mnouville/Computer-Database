@@ -45,7 +45,7 @@ public class DeleteComputerServlet extends HttpServlet {
       List<Dto> dtos = this.mapper.computersToDtos(this.serviceComputer.getComputers());
       int max = this.serviceComputer.getCount();
       request.setAttribute("maxcomputer", max);
-      request.setAttribute("computers", dtos);
+      request.setAttribute("computers", dtos); 
     } catch (NumberFormatException | SQLException e) {
       e.printStackTrace();
     }

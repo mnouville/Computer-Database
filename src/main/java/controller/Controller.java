@@ -1,7 +1,5 @@
 package controller;
 
-import beans.HelloWorldService;
-
 import dao.DaoFactory;
 import dnl.utils.text.table.TextTable;
 
@@ -17,8 +15,6 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import service.ServiceCompany;
 import service.ServiceCompanyImpl;
@@ -48,6 +44,7 @@ public class Controller {
    * @param args String[]
    */
   public static void main(String[] args) throws SQLException {
+    /*
     // loading the definitions from the given XML file
     ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
  
@@ -59,7 +56,15 @@ public class Controller {
     service.setName("Spring");
     message = service.sayHello();
     System.out.println(message);
-    ((ClassPathXmlApplicationContext) context).close();
+    ((ClassPathXmlApplicationContext) context).close();*/
+    
+    /*ApplicationContext vApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
+    
+    HelloWorldService service = vApplicationContext.getBean("HelloWorldService",HelloWorldService.class);
+    System.out.println(service.sayHello());
+    
+    service.setName("Spring");
+    System.out.println(service.sayHello());*/
     
     DaoFactory daoFactory = DaoFactory.getInstance();
     Controller ctrl = new Controller(daoFactory);

@@ -1,7 +1,5 @@
 package dao;
 
-import controller.Controller;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,12 +25,12 @@ public class CompanyDaoImpl implements CompanyDao {
 
   private DaoFactory daoFactory;
   private static CompanyDaoImpl single_instance = null;
-  private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
   private final String get = "SELECT id,name FROM company where id =";
   private final String count = "SELECT COUNT(*) from company where id =";
-
+  
   /**
    * Constructor of CampanyDaoImpl.
    * 

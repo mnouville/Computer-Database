@@ -1,8 +1,8 @@
 package beans;
 
-import org.springframework.stereotype.Service;
+import javax.inject.Named;
 
-@Service("helloWorldService")
+@Named("HelloWorldService")
 public class HelloWorldService {
  
   private String name;

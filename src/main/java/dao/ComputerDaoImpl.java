@@ -1,7 +1,5 @@
 package dao;
 
-import controller.Controller;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,7 +25,7 @@ public class ComputerDaoImpl implements ComputerDao {
 
   private DaoFactory daoFactory;
   private static ComputerDaoImpl single_instance = null;
-  private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
   private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer";

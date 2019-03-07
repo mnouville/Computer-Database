@@ -21,6 +21,8 @@
 		<jquery.version>3.3.1</jquery.version>
 		<HikariCP.version>3.3.1</HikariCP.version>
 		<spring.version>5.1.5.RELEASE</spring.version>
+		<javax.annotation-api.version>1.2</javax.annotation-api.version>
+		<javax.inject.version>1</javax.inject.version>
 	</properties>
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -31,6 +33,16 @@
 	
 	
 	<dependencies>
+		<dependency>
+		    <groupId>javax.annotation</groupId>
+		    <artifactId>javax.annotation-api</artifactId>
+		    <version>${javax.annotation-api.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.inject</groupId>
+		    <artifactId>javax.inject</artifactId>
+		    <version>${javax.inject.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
