@@ -93,11 +93,9 @@ public class AddComputerServlet extends HttpServlet {
       Company comp;
       int companyid = Integer.parseInt(request.getParameter("companyid"));
       if (companyid != 0 && this.validator.validCompanyId(companyid)) {
-        System.out.println("if");
         comp = this.serviceCompany.getCompany(
                Integer.parseInt(request.getParameter("companyid")));
       } else {
-        System.out.println("else");
         comp = new Company(companyid,"");
       }
       

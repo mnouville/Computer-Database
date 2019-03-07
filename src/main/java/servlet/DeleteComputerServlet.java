@@ -36,8 +36,6 @@ public class DeleteComputerServlet extends HttpServlet {
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    // TODO Auto-generated method stub
-    System.out.println(request.getParameter("selection"));
     String[] parts = request.getParameter("selection").split(",");
 
     try {
@@ -49,7 +47,6 @@ public class DeleteComputerServlet extends HttpServlet {
       request.setAttribute("maxcomputer", max);
       request.setAttribute("computers", dtos);
     } catch (NumberFormatException | SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,

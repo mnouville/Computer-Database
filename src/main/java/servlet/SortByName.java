@@ -61,10 +61,8 @@ public class SortByName extends HttpServlet {
     }
 
     if (request.getParameter("type").equals("ASC")) {
-      System.out.println("RETURN DESC");
       request.setAttribute("type", "DESC");
     } else {
-      System.out.println("RETURN ASC");
       request.setAttribute("type", "ASC");
     }
     
