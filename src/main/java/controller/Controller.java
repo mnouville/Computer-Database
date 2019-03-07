@@ -1,5 +1,7 @@
 package controller;
 
+import beans.HelloWorldService;
+
 import dao.DaoFactory;
 import dnl.utils.text.table.TextTable;
 
@@ -15,14 +17,14 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import service.ServiceCompany;
 import service.ServiceCompanyImpl;
 import service.ServiceComputer;
 import service.ServiceComputerImpl;
 import view.View;
-
-
 
 /**
  * Class that implement the console interface for the Application.
@@ -46,6 +48,19 @@ public class Controller {
    * @param args String[]
    */
   public static void main(String[] args) throws SQLException {
+    // loading the definitions from the given XML file
+    ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+ 
+    HelloWorldService service = (HelloWorldService) context.getBean("helloWorldService");
+    String message = service.sayHello();
+    System.out.println(message);
+ 
+    //set a new name
+    service.setName("Spring");
+    message = service.sayHello();
+    System.out.println(message);
+    ((ClassPathXmlApplicationContext) context).close();
+    
     DaoFactory daoFactory = DaoFactory.getInstance();
     Controller ctrl = new Controller(daoFactory);
     ctrl.launchMenu();

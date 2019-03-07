@@ -44,7 +44,12 @@ public class DaoFactory {
    * @return the DAOFactory
    */
   public static DaoFactory getInstance() {
-    return instance;
+    if(instance==null) {
+      return new DaoFactory();
+    } else {
+      return instance;
+    }
+    
   }
   
   /**

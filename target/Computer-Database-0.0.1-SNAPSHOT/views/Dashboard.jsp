@@ -64,7 +64,7 @@
                                     </a>
                             </span>
                         </th>
-                        <th style="width:30%;">
+                        <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
 									<a href="SortByName?page=${param['page']}&type=ASC&sort=name">Computer name</a>
@@ -96,7 +96,7 @@
 			            	</c:choose>
                         </th>
                         <!-- Table header for Company -->
-                        <th style="width:30%;">
+                        <th>
                            	<c:choose>
 				            	<c:when test="${param['type'] == null}">
 									<a href="SortByCompanyName?page=${param['page']}&type=ASC&sort=name">Company</a>

@@ -440,7 +440,7 @@ public class ComputerDaoImpl implements ComputerDao {
     try (Connection connexion = DaoFactory.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
-          sortcompanyname + "order by comp.name " + type + " LIMIT 50 OFFSET " + begin);
+          sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin);
       CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
