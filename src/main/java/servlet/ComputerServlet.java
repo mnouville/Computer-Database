@@ -29,14 +29,14 @@ public class ComputerServlet extends HttpServlet {
 
   @Autowired
   private ServiceComputer serviceComputer;
+  
+  @Autowired
   private MapperDto mapper;
   
   @Override
   public void init(ServletConfig config) throws ServletException{
-    this.mapper = new MapperDto();
     super.init(config);
     SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-    
   }
 
   /**

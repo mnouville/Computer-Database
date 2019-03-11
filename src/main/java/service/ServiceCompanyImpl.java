@@ -1,7 +1,6 @@
 package service;
 
 import dao.CompanyDao;
-import dao.CompanyDaoImpl;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,29 +21,6 @@ public class ServiceCompanyImpl implements ServiceCompany {
 
   @Autowired
   private CompanyDao companyDao;
-  private static ServiceCompanyImpl single_instance = null;
-
-  /**
-   * Constructor of the class ServiceCompanyImpl.
-   * 
-   * @param daoFactory Object
-   */
-  public ServiceCompanyImpl() {
-    this.companyDao = CompanyDaoImpl.getInstance();
-  }
-  
-  /**
-   * Return unique instance of ServiceCompanyImpl.
-   * @return ServiceCompanyImpl
-   */
-  public static ServiceCompanyImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new ServiceCompanyImpl();
-    }
-      
-    return single_instance;
-  }
 
   /**
    * Method for adding new Company in the Database.

@@ -6,23 +6,24 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import service.ServiceCompany;
-import service.ServiceCompanyImpl;
 
 /**
  * Class Validator.java
  * @author mnouville
  * @version 1.0
  */
+
+@Component
 public class Validator {
 
   private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
+  
+  @Autowired
   private ServiceCompany serviceCompany;
-
-  public Validator() {
-    this.serviceCompany = ServiceCompanyImpl.getInstance();
-  }
   
   /**
    * Method for the validation of Computer Name.
@@ -71,7 +72,7 @@ public class Validator {
   public boolean validCompanyId(int id) throws SQLException {
     try {
       // check if the id is a valid company that exist in the table company
-      if (this.serviceCompany.companyExist(id)) {
+      if (serviceCompany.companyExist(id)) {
         return true;
       } else {
         LOG.error("The following Company Does not exist : " + id);

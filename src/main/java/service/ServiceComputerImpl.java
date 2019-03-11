@@ -1,7 +1,6 @@
 package service;
 
 import dao.ComputerDao;
-import dao.ComputerDaoImpl;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,30 +21,7 @@ public class ServiceComputerImpl implements ServiceComputer {
 
   @Autowired
   private ComputerDao computerDao;
-  private static ServiceComputerImpl single_instance = null;
-
-  /**
-   * Constructor of the Class ServiceComputerImpl.
-   * 
-   * @param daoFactory DaoFactory
-   */
-  public ServiceComputerImpl() {
-    this.computerDao = ComputerDaoImpl.getInstance();
-  }
   
-  /**
-   * Return unique instance of ServiceCompanyImpl.
-   * @return ServiceCompanyImpl
-   */
-  public static ServiceComputerImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new ServiceComputerImpl();
-    }
-      
-    return single_instance;
-  }
-
   /**
    * Method for adding a computer in the database.
    * 
