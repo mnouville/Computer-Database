@@ -7,18 +7,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import mappers.MapperDto;
 import model.Company;
 import model.Computer;
 import service.ServiceCompany;
-import service.ServiceCompanyImpl;
 import service.ServiceComputer;
-import service.ServiceComputerImpl;
 import validator.Validator;
 
 /**
@@ -27,17 +29,22 @@ import validator.Validator;
 public class EditComputerServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
+  @Autowired
   private ServiceComputer serviceComputer;
+  
+  @Autowired
   private ServiceCompany serviceCompany;
+  
+  @Autowired
   private MapperDto mapper;
+  
+  @Autowired
   private Validator validator;
 
   @Override
-  public void init() throws ServletException {
-    this.serviceComputer = ServiceComputerImpl.getInstance();
-    this.serviceCompany = ServiceCompanyImpl.getInstance();
-    this.mapper = new MapperDto();
-    this.validator = new Validator();
+  public void init(ServletConfig config) throws ServletException{
+    super.init(config);
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
   }
 
   /**

@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import model.Computer;
 import service.ServiceComputer;
-import service.ServiceComputerImpl;
 
 /**
  * Servlet implementation class SortServlet.
@@ -21,11 +24,13 @@ import service.ServiceComputerImpl;
 public class SortServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
+  @Autowired
   private ServiceComputer serviceComputer;
 
   @Override
-  public void init() throws ServletException {
-    this.serviceComputer = ServiceComputerImpl.getInstance();
+  public void init(ServletConfig config) throws ServletException{
+    super.init(config);
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
   }
 
   /**

@@ -1,7 +1,5 @@
 package dao;
 
-import controller.Controller;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +12,10 @@ import model.Company;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 
 
@@ -23,24 +25,32 @@ import org.slf4j.LoggerFactory;
  * @author mnouville
  * @version 1.0
  */
+@Repository
 public class CompanyDaoImpl implements CompanyDao {
 
-  private DaoFactory daoFactory;
   private static CompanyDaoImpl single_instance = null;
-  private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
   private final String get = "SELECT id,name FROM company where id =";
   private final String count = "SELECT COUNT(*) from company where id =";
+  
+  @Autowired
+  private HikariDataSource dataSource;
 
+  /**
+   * Method that return the connection of Hikari
+   * @return the connection to the database
+   */
+  public Connection getConnection() throws SQLException {
+    return dataSource.getConnection();
+  }
   /**
    * Constructor of CampanyDaoImpl.
    * 
    * @param daoFactory DaoFactory
    */
-  CompanyDaoImpl(DaoFactory daoFactory) {
-    this.setDaoFactory(daoFactory);
-  }
+  CompanyDaoImpl() { }
   
   /**
    * Return unique instance of CompanyDaoImpl.
@@ -49,7 +59,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public static CompanyDaoImpl getInstance() {
     // Singleton
     if (single_instance == null) {
-      single_instance = new CompanyDaoImpl(DaoFactory.getInstance());
+      single_instance = new CompanyDaoImpl();
     }
       
     return single_instance;
@@ -62,7 +72,7 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   @Override
   public void addCompany(Company c) throws SQLException {
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
       preparedStatement.setInt(1, c.getId());
       preparedStatement.setString(2, c.getName());
@@ -83,7 +93,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public List<Company> getCompanies() throws SQLException {
     List<Company> companies = new ArrayList<Company>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall);
 
@@ -110,11 +120,11 @@ public class CompanyDaoImpl implements CompanyDao {
   @Override
   public void deleteCompany(int id) throws SQLException {    
     
-    try (Connection connect = DaoFactory.getConnection();
+    try (Connection connect = this.getConnection();
         PreparedStatement statementComputers = 
-            connect.prepareStatement("DELETE FROM COMPUTER WHERE company_id = " + id);
+            connect.prepareStatement("DELETE FROM computer WHERE company_id = " + id);
         PreparedStatement statementCompany = 
-            connect.prepareStatement("DELETE FROM COMPANY WHERE id = " + id)) {
+            connect.prepareStatement("DELETE FROM company WHERE id = " + id)) {
       try {
         connect.setAutoCommit(false);
         statementComputers.execute();
@@ -142,7 +152,7 @@ public class CompanyDaoImpl implements CompanyDao {
     Company c = new Company();
     ResultSet resultat = null;
 
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(get + i + ";");
       while (resultat.next()) {
@@ -168,7 +178,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public boolean companyExist(int id) throws SQLException {
     ResultSet resultat = null;
 
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(count + id + ";");
 
@@ -186,13 +196,5 @@ public class CompanyDaoImpl implements CompanyDao {
       e.printStackTrace();
     }
     return false;
-  }
-
-  public DaoFactory getDaoFactory() {
-    return daoFactory;
-  }
-
-  public void setDaoFactory(DaoFactory daoFactory) {
-    this.daoFactory = daoFactory;
   }
 }

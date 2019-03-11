@@ -1,7 +1,5 @@
 package mappers;
 
-import dao.DaoFactory;
-
 import dto.Dto;
 
 import java.sql.SQLException;
@@ -12,13 +10,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import model.Computer;
 import service.ServiceCompany;
-import service.ServiceCompanyImpl;
 
+@Component
 public class MapperDto {
 
   private static MapperDto instance;
+  
+  @Autowired
   private ServiceCompany serviceCompany;
   
   /**
@@ -41,7 +44,7 @@ public class MapperDto {
    */
   public Computer dtoToComputer(Dto dto) {
 
-    this.serviceCompany = new ServiceCompanyImpl(DaoFactory.getInstance());
+    //this.serviceCompany = ServiceCompanyImpl.getInstance();
     
     Computer c = new Computer();
     

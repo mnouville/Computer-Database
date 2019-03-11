@@ -45,6 +45,7 @@ public class View {
     System.out.println("|------------------------------------------|");
     System.out.println("");
     System.out.println("\tGETALL - Get All Companies");
+    System.out.println("\tDELETE - Delete a specific company");
     System.out.println("\tEXIT   - Back to Main Menu ");
     System.out.println("");
     System.out.println("|------------------------------------------|");

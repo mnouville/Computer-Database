@@ -1,10 +1,12 @@
 package service;
 
 import dao.ComputerDao;
-import dao.DaoFactory;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import model.Computer;
 
@@ -14,33 +16,12 @@ import model.Computer;
  * @author mnouville
  * @version 1.0
  */
+@Service
 public class ServiceComputerImpl implements ServiceComputer {
 
+  @Autowired
   private ComputerDao computerDao;
-  private static ServiceComputerImpl single_instance = null;
-
-  /**
-   * Constructor of the Class ServiceComputerImpl.
-   * 
-   * @param daoFactory DaoFactory
-   */
-  public ServiceComputerImpl(DaoFactory daoFactory) {
-    this.computerDao = daoFactory.getComputerDao();
-  }
   
-  /**
-   * Return unique instance of ServiceCompanyImpl.
-   * @return ServiceCompanyImpl
-   */
-  public static ServiceComputerImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new ServiceComputerImpl(DaoFactory.getInstance());
-    }
-      
-    return single_instance;
-  }
-
   /**
    * Method for adding a computer in the database.
    * 

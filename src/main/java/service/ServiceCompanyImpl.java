@@ -1,10 +1,12 @@
 package service;
 
 import dao.CompanyDao;
-import dao.DaoFactory;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import model.Company;
 
@@ -14,32 +16,11 @@ import model.Company;
  * @author mnouville
  * @version 1.0
  */
+@Service
 public class ServiceCompanyImpl implements ServiceCompany {
 
+  @Autowired
   private CompanyDao companyDao;
-  private static ServiceCompanyImpl single_instance = null;
-
-  /**
-   * Constructor of the class ServiceCompanyImpl.
-   * 
-   * @param daoFactory Object
-   */
-  public ServiceCompanyImpl(DaoFactory daoFactory) {
-    this.companyDao = daoFactory.getCompanyDao();
-  }
-  
-  /**
-   * Return unique instance of ServiceCompanyImpl.
-   * @return ServiceCompanyImpl
-   */
-  public static ServiceCompanyImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new ServiceCompanyImpl(DaoFactory.getInstance());
-    }
-      
-    return single_instance;
-  }
 
   /**
    * Method for adding new Company in the Database.
