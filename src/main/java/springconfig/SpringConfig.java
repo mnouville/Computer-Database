@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@ComponentScan("beans")
+@ComponentScan({"dao","service","servlet","mappers"})
 @PropertySource(value = { "classpath:hikariconfig.properties" })
 public class SpringConfig {
 

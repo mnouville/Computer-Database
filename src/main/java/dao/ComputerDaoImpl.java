@@ -14,6 +14,10 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Class that contains every method concerning Computer in the Database.
@@ -21,9 +25,11 @@ import org.slf4j.LoggerFactory;
  * @author mnouville
  * @version 1.0
  */
+@Repository
 public class ComputerDaoImpl implements ComputerDao {
 
-  private DaoFactory daoFactory;
+  @Autowired
+  private CompanyDaoImpl companyDao;
   private static ComputerDaoImpl single_instance = null;
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
@@ -38,14 +44,23 @@ public class ComputerDaoImpl implements ComputerDao {
                                        + "c.company_id FROM computer c" 
                                        + " LEFT JOIN company comp on c.company_id = comp.id ";
 
+  @Autowired
+  private HikariDataSource dataSource;
+
+  /**
+   * Method that return the connection of Hikari
+   * @return the connection to the database
+   */
+  public Connection getConnection() throws SQLException {
+    return dataSource.getConnection();
+  }
+  
   /**
    * Constructor of ComputerDaoImpl.
    * 
    * @param daoFactory DaoFactory
    */
-  ComputerDaoImpl(DaoFactory daoFactory) {
-    this.daoFactory = daoFactory;
-  }
+  ComputerDaoImpl() { }
   
   /**
    * Return unique instance of ComputerDaoImpl.
@@ -54,7 +69,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public static ComputerDaoImpl getInstance() {
     // Singleton
     if (single_instance == null) {
-      single_instance = new ComputerDaoImpl(DaoFactory.getInstance());
+      single_instance = new ComputerDaoImpl();
     }
       
     return single_instance;
@@ -67,7 +82,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void addComputer(Computer c) throws SQLException {
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
       preparedStatement.setInt(1, c.getId());
       preparedStatement.setString(2, c.getName());
@@ -108,10 +123,9 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> getComputers() throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " LIMIT 50;");
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -119,7 +133,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
@@ -140,10 +154,9 @@ public class ComputerDaoImpl implements ComputerDao {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
 
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " LIMIT 50 OFFSET " + begin);
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -151,7 +164,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
@@ -169,7 +182,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void deleteComputer(int id) throws SQLException {
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         PreparedStatement preparedStatement = connexion.prepareStatement(delete + id)) {
       preparedStatement.executeUpdate();
       LOG.info("Request succesfully executed (DELETE COMPUTERS)! ");
@@ -190,7 +203,7 @@ public class ComputerDaoImpl implements ComputerDao {
     Computer c = new Computer();
     ResultSet resultat = null;
 
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
 
       resultat = statement.executeQuery(get + i + ";");
@@ -202,9 +215,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Date discontinued = resultat.getDate("discontinued");
         int companyid = resultat.getInt("company_id");
 
-        CompanyDao cd = daoFactory.getCompanyDao();
-
-        c = new Computer(id, name, introduced, discontinued, cd.getCompany(companyid));
+        c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(companyid));
       }
       LOG.info("Request succesfully executed (GET COMPUTER)! ");
     } catch (SQLException e) {
@@ -239,7 +250,7 @@ public class ComputerDaoImpl implements ComputerDao {
     }
 
     if (c.getCompany().getId() == 0) {
-      try (Connection connexion = DaoFactory.getConnection();
+      try (Connection connexion = this.getConnection();
           PreparedStatement preparedStatement = connexion
               .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
                   + intro + " ,discontinued = " + disc + ", company_id = NULL" + " where id = "
@@ -251,7 +262,7 @@ public class ComputerDaoImpl implements ComputerDao {
         e.printStackTrace();
       }
     } else {
-      try (Connection connexion = DaoFactory.getConnection();
+      try (Connection connexion = this.getConnection();
           PreparedStatement preparedStatement = connexion
               .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
                   + intro + " ,discontinued = " + disc + ", company_id = " + c.getCompany().getId()
@@ -276,7 +287,7 @@ public class ComputerDaoImpl implements ComputerDao {
   @Override
   public int getMaxId() throws SQLException {
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(maxid);
       if (resultat.next()) {
@@ -297,7 +308,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   public int getCount() throws SQLException {
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(count);
       if (resultat.next()) {
@@ -317,10 +328,9 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> searchName(String search) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(getall + " where name LIKE '%" + search + "%' LIMIT 50;");
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -328,7 +338,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
@@ -345,11 +355,10 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByName(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by name " + type + " LIMIT 50 OFFSET " + begin);
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -357,7 +366,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed "
@@ -375,11 +384,10 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByIntro(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by introduced " + type + " LIMIT 50 OFFSET " + begin);
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -387,7 +395,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed "
@@ -405,11 +413,10 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByDisc(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           getall + " order by discontinued " + type + " LIMIT 50 OFFSET " + begin);
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -417,7 +424,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed "
@@ -435,11 +442,10 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> sortByCompanyName(String type, int begin) throws SQLException {
     List<Computer> computers = new ArrayList<Computer>();
     ResultSet resultat = null;
-    try (Connection connexion = DaoFactory.getConnection();
+    try (Connection connexion = this.getConnection();
         Statement statement = connexion.createStatement()) {
       resultat = statement.executeQuery(
           sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin);
-      CompanyDao cd = daoFactory.getCompanyDao();
       while (resultat.next()) {
         Integer id = resultat.getInt("id");
         String name = resultat.getString("name");
@@ -447,7 +453,7 @@ public class ComputerDaoImpl implements ComputerDao {
         Timestamp discontinued = resultat.getTimestamp("discontinued");
         int idcompany = resultat.getInt("company_id");
 
-        Computer c = new Computer(id, name, introduced, discontinued, cd.getCompany(idcompany));
+        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
         computers.add(c);
       }
       LOG.info("Request succesfully executed "

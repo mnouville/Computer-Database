@@ -1,7 +1,5 @@
 package validator;
 
-import dao.DaoFactory;
-
 import java.sql.SQLException;
 
 import model.Computer;
@@ -20,12 +18,10 @@ import service.ServiceCompanyImpl;
 public class Validator {
 
   private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
-  private DaoFactory daoFactory;
   private ServiceCompany serviceCompany;
 
   public Validator() {
-    this.daoFactory = DaoFactory.getInstance();
-    this.serviceCompany = new ServiceCompanyImpl(daoFactory);
+    this.serviceCompany = ServiceCompanyImpl.getInstance();
   }
   
   /**

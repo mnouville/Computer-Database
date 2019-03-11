@@ -18,6 +18,7 @@
 /home/excilys/workspace/Computer-Database/src/main/java/service/ServiceComputer.java
 /home/excilys/workspace/Computer-Database/src/main/java/controller/Controller.java
 /home/excilys/workspace/Computer-Database/src/main/java/servlet/AddComputerServlet.java
+/home/excilys/workspace/Computer-Database/src/main/java/springconfig/SpringConfig.java
 /home/excilys/workspace/Computer-Database/src/main/java/servlet/SortByIntro.java
 /home/excilys/workspace/Computer-Database/src/main/java/servlet/SortByCompanyName.java
 /home/excilys/workspace/Computer-Database/src/main/java/controller/Feature.java

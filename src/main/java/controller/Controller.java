@@ -1,6 +1,5 @@
 package controller;
 
-import dao.DaoFactory;
 import dnl.utils.text.table.TextTable;
 
 import java.sql.SQLException;
@@ -30,7 +29,6 @@ import view.View;
  */
 public class Controller {
 
-  private DaoFactory daoFactory;
   private ServiceComputer serviceComputer;
   private ServiceCompany serviceCompany;
   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
@@ -65,9 +63,10 @@ public class Controller {
     
     service.setName("Spring");
     System.out.println(service.sayHello());*/
+    String letters = "abcdef";
+    System.out.println(letters.charAt(3));
     
-    DaoFactory daoFactory = DaoFactory.getInstance();
-    Controller ctrl = new Controller(daoFactory);
+    Controller ctrl = new Controller();
     ctrl.launchMenu();
   }
 
@@ -76,10 +75,9 @@ public class Controller {
    * 
    * @param daoFactory DaoFactory
    */
-  public Controller(DaoFactory daoFactory) {
-    this.daoFactory = daoFactory;
-    this.setServiceCompany(new ServiceCompanyImpl(daoFactory));
-    this.setServiceComputer(new ServiceComputerImpl(daoFactory));
+  public Controller() {
+    this.setServiceCompany(ServiceCompanyImpl.getInstance());
+    this.setServiceComputer(ServiceComputerImpl.getInstance());
     this.setView(new View());
   }
 
@@ -241,7 +239,7 @@ public class Controller {
       // check if the id is a valid company that exist in the table company
       if (this.serviceCompany.companyExist(companyid)) {
         Computer c = new Computer(this.serviceComputer.getMaxId(), name, ts1, ts2,
-            this.daoFactory.getCompanyDao().getCompany(companyid));
+            this.serviceCompany.getCompany(companyid));
         // check if all informations are valid
         if (c.validComputer()) {
           LOG.info("Computer Add Request : " + c.toString());
@@ -336,7 +334,7 @@ public class Controller {
         // check is the value is a valid company id that exist in the table company
         if (this.serviceCompany.companyExist(companyid)) {
           Computer c = new Computer(i, name, ts1, ts2,
-              this.daoFactory.getCompanyDao().getCompany(companyid));
+              this.serviceCompany.getCompany(companyid));
           // check if all informations are valid
           if (c.validComputer()) {
             LOG.info("Request update Computer : " + c.getId() + " with datas : " + c.toString());
@@ -404,24 +402,6 @@ public class Controller {
     this.getView().printTableDatabase(table);
 
     launchMenuComputer();
-  }
-
-  /**
-   * Getter of the class Controller, return the DaoFactory Attribute.
-   * 
-   * @return Object DaoFactory
-   */
-  public DaoFactory getDaoFactory() {
-    return daoFactory;
-  }
-
-  /**
-   * Setter of the class Controller, set manually the attribute DaoFactory.
-   * 
-   * @param daoFactory DaoFactory Object
-   */
-  public void setDaoFactory(DaoFactory daoFactory) {
-    this.daoFactory = daoFactory;
   }
 
   /**

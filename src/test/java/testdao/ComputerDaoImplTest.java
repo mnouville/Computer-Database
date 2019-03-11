@@ -2,9 +2,6 @@ package testdao;
 
 import static org.junit.Assert.assertEquals;
 
-import dao.ComputerDao;
-import dao.DaoFactory;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -16,20 +13,15 @@ import org.junit.Test;
 import service.ServiceComputer;
 import service.ServiceComputerImpl;
 
-
-
 public class ComputerDaoImplTest {
-
-  private DaoFactory daoFactory = DaoFactory.getInstance();
 
   /**
    * JUnit test for adding computer.
-   * 
    */
   @Test
   public void testAddComputer() throws SQLException {
     
-    ServiceComputer serviceComputer = new ServiceComputerImpl(DaoFactory.getInstance());
+    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
     Computer c = new Computer(1000, "UnitTestComputer", null, null, new Company(1, "Apple Inc."));
     int c1 = serviceComputer.getCount();
     serviceComputer.addComputer(c);
@@ -49,10 +41,10 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testDeleteComputer() throws SQLException {
-    ComputerDao cd = daoFactory.getComputerDao();
-    Computer c = cd.getComputer(1000);
-    cd.deleteComputer(c.getId());
-    List<Computer> computers = cd.getComputers();
+    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
+    Computer c = serviceComputer.getComputer(1000);
+    serviceComputer.deleteComputer(c.getId());
+    List<Computer> computers = serviceComputer.getComputers();
 
     boolean b = false;
     if (computers.contains(c)) {
@@ -68,8 +60,8 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testGetCompany() throws SQLException {
-    ComputerDao cd = daoFactory.getComputerDao();
-    Computer c = cd.getComputer(1);
+    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
+    Computer c = serviceComputer.getComputer(1);
 
     boolean b = false;
     if (c != null) {
@@ -85,8 +77,8 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testGetCompanies() throws SQLException {
-    ComputerDao cd = daoFactory.getComputerDao();
-    List<Computer> computers = cd.getComputers();
+    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
+    List<Computer> computers = serviceComputer.getComputers();
 
     boolean b = false;
     if (computers.size() > 0) {

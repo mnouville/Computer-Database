@@ -11,6 +11,7 @@ model/Computer.class
 dao/DaoFactory.class
 dto/Dto.class
 beans/HelloWorldService.class
+springconfig/SpringConfig.class
 view/View.class
 servlet/DeleteComputerServlet.class
 servlet/AddComputerServlet.class
