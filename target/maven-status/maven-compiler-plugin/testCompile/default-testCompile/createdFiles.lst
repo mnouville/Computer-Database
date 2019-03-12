@@ -1,6 +1,0 @@
-testmodel/CompanyTest.class
-testmodel/ComputerTest.class
-testdao/springDataSourceTest.class
-testdao/ComputerDaoImplTest.class
-testdao/CompanyDaoImplTest.class
-testvalidator/ValidatorTest.class

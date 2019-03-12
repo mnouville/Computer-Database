@@ -28,7 +28,6 @@ import com.zaxxer.hikari.HikariDataSource;
 @Repository
 public class CompanyDaoImpl implements CompanyDao {
 
-  private static CompanyDaoImpl single_instance = null;
   private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
@@ -51,19 +50,6 @@ public class CompanyDaoImpl implements CompanyDao {
    * @param daoFactory DaoFactory
    */
   CompanyDaoImpl() { }
-  
-  /**
-   * Return unique instance of CompanyDaoImpl.
-   * @return CompanyDaoImpl
-   */
-  public static CompanyDaoImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new CompanyDaoImpl();
-    }
-      
-    return single_instance;
-  }
 
   /**
    * This method take a Company in parameter and add it into the Database.

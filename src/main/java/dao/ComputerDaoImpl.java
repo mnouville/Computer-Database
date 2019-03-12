@@ -30,7 +30,6 @@ public class ComputerDaoImpl implements ComputerDao {
 
   @Autowired
   private CompanyDaoImpl companyDao;
-  private static ComputerDaoImpl single_instance = null;
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
@@ -61,19 +60,6 @@ public class ComputerDaoImpl implements ComputerDao {
    * @param daoFactory DaoFactory
    */
   ComputerDaoImpl() { }
-  
-  /**
-   * Return unique instance of ComputerDaoImpl.
-   * @return ComputerDaoImpl
-   */
-  public static ComputerDaoImpl getInstance() {
-    // Singleton
-    if (single_instance == null) {
-      single_instance = new ComputerDaoImpl();
-    }
-      
-    return single_instance;
-  }
 
   /**
    * This method take a Computer in parameter and add it into the Database.
