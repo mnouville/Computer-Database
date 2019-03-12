@@ -59,7 +59,7 @@ public class SortByName extends HttpServlet {
       request.setAttribute("maxcomputer", max);
       List<Computer> computers;
       List<Dto> dtos;
-      computers = this.serviceComputer.sortByName(request.getParameter("type"), offset);
+      computers = this.serviceComputer.sortByColumn(request.getParameter("type"), offset,"name");
       dtos = this.mapper.computersToDtos(computers);
       
       

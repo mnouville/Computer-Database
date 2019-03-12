@@ -58,7 +58,7 @@ public class SortByCompanyName extends HttpServlet {
       int offset = (page - 1) * 50;
       List<Computer> computers;
       List<Dto> dtos;
-      computers = this.serviceComputer.sortByCompanyName(request.getParameter("type"), offset);
+      computers = this.serviceComputer.sortByColumn(request.getParameter("type"), offset,"company");
       dtos = this.mapper.computersToDtos(computers);
       request.setAttribute("maxcomputer", max);
       request.setAttribute("sort", "company");

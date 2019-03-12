@@ -78,34 +78,10 @@ public interface ServiceComputer {
   List<Computer> searchName(String search) throws SQLException;
   
   /**
-   * Return a list of computers ordered by name.
-   * @param type String
-   * @param begin int
-   * @return List of computers
-   */
-  List<Computer> sortByName(String type, int begin) throws SQLException;
-  
-  /**
-   * Return a list of computers ordered by Introduced.
+   * Return a list of computers ordered by a specific column.
    * @param type String
    * @param begin int
    * @return
    */
-  List<Computer> sortByIntro(String type, int begin) throws SQLException;
-  
-  /**
-   * Return a list of computers ordered by Discontinued.
-   * @param type String
-   * @param begin int
-   * @return
-   */
-  List<Computer> sortByDisc(String type, int begin) throws SQLException;
-  
-  /**
-   * Return a list of computers ordered by Company Name.
-   * @param type String
-   * @param begin int
-   * @return
-   */
-  List<Computer> sortByCompanyName(String type, int begin) throws SQLException;
+  List<Computer> sortByColumn(String type, int begin, String column) throws SQLException;
 }
