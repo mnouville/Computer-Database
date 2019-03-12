@@ -110,42 +110,12 @@ public class ServiceComputerImpl implements ServiceComputer {
   }
   
   /**
-   * Method that list computers ordered by name.
+   * Method that list computers ordered by a specific column.
    * @param type String
    * @param begin int
    * @return List of computers
    */
-  public List<Computer> sortByName(String type, int begin) throws SQLException {
-    return this.computerDao.sortByName(type, begin);
-  }
-  
-  /**
-   * Method that list computers ordered by Introduced.
-   * @param type String
-   * @param begin int
-   * @return List of computers
-   */
-  public List<Computer> sortByIntro(String type, int begin) throws SQLException {
-    return this.computerDao.sortByIntro(type, begin);
-  }
-  
-  /**
-   * Method that list computers ordered by Introduced.
-   * @param type String
-   * @param begin int
-   * @return List of computers
-   */
-  public List<Computer> sortByDisc(String type, int begin) throws SQLException {
-    return this.computerDao.sortByDisc(type, begin);
-  }
-  
-  /**
-   * Method that list computers ordered by Company Name.
-   * @param type String
-   * @param begin int
-   * @return List of computers
-   */
-  public List<Computer> sortByCompanyName(String type, int begin) throws SQLException {
-    return this.computerDao.sortByCompanyName(type, begin);
+  public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {
+    return this.computerDao.sortByColumn(type, begin, column);
   }
 }
