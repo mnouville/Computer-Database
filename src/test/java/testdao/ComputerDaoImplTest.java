@@ -9,19 +9,22 @@ import model.Company;
 import model.Computer;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import service.ServiceComputer;
-import service.ServiceComputerImpl;
 
+@Component
 public class ComputerDaoImplTest {
 
+  @Autowired
+  private ServiceComputer serviceComputer;
+  
   /**
    * JUnit test for adding computer.
    */
   @Test
   public void testAddComputer() throws SQLException {
-    
-    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
     Computer c = new Computer(1000, "UnitTestComputer", null, null, new Company(1, "Apple Inc."));
     int c1 = serviceComputer.getCount();
     serviceComputer.addComputer(c);
@@ -41,7 +44,6 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testDeleteComputer() throws SQLException {
-    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
     Computer c = serviceComputer.getComputer(1000);
     serviceComputer.deleteComputer(c.getId());
     List<Computer> computers = serviceComputer.getComputers();
@@ -60,7 +62,6 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testGetCompany() throws SQLException {
-    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
     Computer c = serviceComputer.getComputer(1);
 
     boolean b = false;
@@ -77,7 +78,6 @@ public class ComputerDaoImplTest {
    */
   @Test
   public void testGetCompanies() throws SQLException {
-    ServiceComputer serviceComputer = ServiceComputerImpl.getInstance();
     List<Computer> computers = serviceComputer.getComputers();
 
     boolean b = false;
