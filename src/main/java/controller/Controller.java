@@ -14,11 +14,13 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
 import service.ServiceCompany;
-import service.ServiceCompanyImpl;
 import service.ServiceComputer;
-import service.ServiceComputerImpl;
+//import springconfig.SpringConfig;
 import view.View;
 
 /**
@@ -27,47 +29,29 @@ import view.View;
  * @author mnouville
  * @version 1.0
  */
+
+@Component
 public class Controller {
 
+  @Autowired
   private ServiceComputer serviceComputer;
+  
+  @Autowired
   private ServiceCompany serviceCompany;
+  
   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
   private View view;
   private Scanner sc;
   private static final String ENUM_LIST = "ADD,DELETE,UPDATE,GET,GETALL,EXIT";
-
+  private AnnotationConfigApplicationContext vApplicationContext;
   /**
    * Main of the class Controller.
    * 
    * @param args String[]
    */
   public static void main(String[] args) throws SQLException {
-    /*
-    // loading the definitions from the given XML file
-    ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
- 
-    HelloWorldService service = (HelloWorldService) context.getBean("helloWorldService");
-    String message = service.sayHello();
-    System.out.println(message);
- 
-    //set a new name
-    service.setName("Spring");
-    message = service.sayHello();
-    System.out.println(message);
-    ((ClassPathXmlApplicationContext) context).close();*/
-    
-    /*ApplicationContext vApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
-    
-    HelloWorldService service = vApplicationContext.getBean("HelloWorldService",HelloWorldService.class);
-    System.out.println(service.sayHello());
-    
-    service.setName("Spring");
-    System.out.println(service.sayHello());*/
-    String letters = "abcdef";
-    System.out.println(letters.charAt(3));
-    
-    Controller ctrl = new Controller();
-    ctrl.launchMenu();
+      Controller ctrl = new Controller();
+      ctrl.launchMenu();
   }
 
   /**
@@ -76,8 +60,7 @@ public class Controller {
    * @param daoFactory DaoFactory
    */
   public Controller() {
-    this.setServiceCompany(ServiceCompanyImpl.getInstance());
-    this.setServiceComputer(ServiceComputerImpl.getInstance());
+    //this.vApplicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
     this.setView(new View());
   }
 
@@ -97,6 +80,7 @@ public class Controller {
         launchMenuComputer();
         break;
       case "3":
+        vApplicationContext.close();
         System.exit(0);
         break;
       default:

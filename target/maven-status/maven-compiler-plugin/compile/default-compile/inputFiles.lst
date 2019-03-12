@@ -14,7 +14,6 @@
 /home/excilys/workspace/Computer-Database/src/main/java/view/View.java
 /home/excilys/workspace/Computer-Database/src/main/java/validator/Validator.java
 /home/excilys/workspace/Computer-Database/src/main/java/dao/ComputerDao.java
-/home/excilys/workspace/Computer-Database/src/main/java/beans/HelloWorldService.java
 /home/excilys/workspace/Computer-Database/src/main/java/service/ServiceComputer.java
 /home/excilys/workspace/Computer-Database/src/main/java/controller/Controller.java
 /home/excilys/workspace/Computer-Database/src/main/java/servlet/AddComputerServlet.java
