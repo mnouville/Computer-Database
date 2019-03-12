@@ -2,9 +2,6 @@ package servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -17,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
+import dto.Dto;
+import exceptions.ValidationException;
 import mappers.MapperDto;
 import model.Company;
 import model.Computer;
@@ -73,59 +72,33 @@ public class AddComputerServlet extends HttpServlet {
    */
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    Company comp;
+    int companyid = Integer.parseInt(request.getParameter("companyid"));
     try {
-      Computer c = new Computer();
+      validator.verifyValidCompanyId(companyid);
+      comp = this.serviceCompany.getCompany(Integer.parseInt(request.getParameter("companyid")));
+      Dto dto = new Dto(this.serviceComputer.getMaxId()+"",
+                        request.getParameter("name"), 
+                        request.getParameter("introduced"), 
+                        request.getParameter("discontinued"), 
+                        comp.getId()+"", comp.getName() );
       
-      c.setId(this.serviceComputer.getMaxId());
-      
-      c.setName(request.getParameter("name"));
-      
-      SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-      Date introduced;
-      if (this.validator.validIntroduced(request.getParameter("introduced"))) {
-        introduced = formatter.parse(request.getParameter("introduced"));
-      } else {
-        introduced = null;
-      }
-      c.setIntroduced(introduced);
-      
-      Date discontinued;
-      if (this.validator.validDiscontinued(request.getParameter("discontinued"))) {
-        discontinued = formatter.parse(request.getParameter("discontinued"));
-      } else {
-        discontinued = null;
-      }
-      c.setDiscontinued(discontinued);
-
-      Company comp;
-      int companyid = Integer.parseInt(request.getParameter("companyid"));
-      if (companyid != 0 && this.validator.validCompanyId(companyid)) {
-        comp = this.serviceCompany.getCompany(
-               Integer.parseInt(request.getParameter("companyid")));
-      } else {
-        comp = new Company(companyid,"");
-      }
-      
-      c.setCompany(comp);
-
-      if (!this.validator.validDates(c)) {
-        request.setAttribute("error", "invalidtimestamp");
-      } else if (!this.validator.validName(c.getName())) {
-        request.setAttribute("error", "invalidname");
-      } else {
-        this.serviceComputer.addComputer(c);
-      }
-        
-      
+      Computer computer = mapper.dtoToComputer(dto);
+      this.validator.verifyComputerNotNull(computer);
+      this.validator.verifyIdNotNull(computer.getId());
+      this.validator.verifyName(computer.getName());
+      this.validator.verifyIntroBeforeDisco(computer);
+      this.serviceComputer.addComputer(computer);
       int max = this.serviceComputer.getCount();
       request.setAttribute("maxcomputer", max);
       request.setAttribute("computers", this.mapper.computersToDtos(
                                         this.serviceComputer.getComputers()));
+      
       this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,
           response);
+    } catch (ValidationException e) {
+      request.setAttribute("error", e.getMessage());
     } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ParseException e) {
       e.printStackTrace();
     }
   }

@@ -4,11 +4,10 @@ import java.sql.SQLException;
 
 import model.Computer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import exceptions.ValidationException;
 import service.ServiceCompany;
 
 /**
@@ -19,84 +18,62 @@ import service.ServiceCompany;
 
 @Component
 public class Validator {
-
-  private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
   
   @Autowired
   private ServiceCompany serviceCompany;
   
   /**
-   * Method for the validation of Computer Name.
+   * Method for the validation of computer id.
    * @param name String
-   * @return
    */
-  public boolean validName(String name) {
-    if (name.equals("") || name == null) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  /**
-   * Method for the validation of introduced Parameter.
-   * @param introduced String
-   * @return
-   */
-  public boolean validIntroduced(String introduced) {
-    if (!introduced.equals("") && introduced != null) {
-      return true;
-    } else {
-      return false;
+  public void verifyIdNotNull(int id) throws ValidationException {
+    if(id == 0) {
+      throw new ValidationException("the id is null or zero");
     }
   }
   
   /**
-   * Method for the validation of discontinued Parameter.
-   * @param discontinued String
-   * @return
+   * Method for the validation of computer name.
+   * @param name String
    */
-  public boolean validDiscontinued(String discontinued) {
-    if (!discontinued.equals("") && discontinued != null) {
-      return true;
-    } else {
-      return false;
+  public void verifyName(String name) throws ValidationException {
+    if(name == null || name.equals("")) {
+      throw new ValidationException("the name is null or empty");
+    }
+  }
+  
+  /**
+   * Method for the validation of computer introduced and discontinued dates.
+   * @param computer Computer
+   */
+  public void verifyIntroBeforeDisco(Computer computer) throws ValidationException {
+    if(computer.getDiscontinued() != null && (computer.getIntroduced() == null || !computer.getIntroduced().before(computer.getDiscontinued()))) {
+      throw new ValidationException("the discontinued date is before the introduction");
+    }
+  }
+  
+  /**
+   * Method for the validation of computer not null.
+   * @param computer Computer
+   */
+  public void verifyComputerNotNull(Computer computer) throws ValidationException {
+    if(computer == null) {
+      throw new ValidationException("the computer is null");
     }
   }
   
   /**
    * Method for the validation of company id Parameter.
    * @param id int
-   * @return
    */
-  public boolean validCompanyId(int id) throws SQLException {
+  public void verifyValidCompanyId(int id) throws SQLException, ValidationException {
     try {
       // check if the id is a valid company that exist in the table company
-      if (serviceCompany.companyExist(id)) {
-        return true;
-      } else {
-        LOG.error("The following Company Does not exist : " + id);
-        return false;
-      }
+      if (!serviceCompany.companyExist(id)) {
+        throw new ValidationException("the computer is null");
+      } 
     } catch (NumberFormatException nfe) {
-      return false;
-    }
-  }
-  
-  /**
-   * Method for the validation of every elements of a computer.
-   * @param c Computer
-   * @return boolean
-   */
-  public boolean validDates(Computer c) {
-    if (c.getIntroduced() != null && c.getDiscontinued() != null) {
-      if (c.getIntroduced().before(c.getDiscontinued())) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
+      throw new ValidationException("the computer is null");
     }
   }
 }
