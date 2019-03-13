@@ -131,4 +131,15 @@ public class Dto {
     this.companyname = companyname;
   }
   
+  public String toString() {
+    String s = "";
+    s += "id : " + this.getId() + ", ";
+    s += "name : " + this.getName() + ", ";
+    s += "introduced : " + this.getIntroduced() + ", ";
+    s += "discontinued : " + this.getDiscontinued() + ", ";
+    s += "companyid : " + this.getCompanyId() + ", ";
+    s += "companyname : " + this.getCompanyname() + ", ";
+    return s;
+  }
+  
 }

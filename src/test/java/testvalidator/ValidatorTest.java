@@ -15,7 +15,7 @@ import dto.Dto;
 import exceptions.ValidationException;
 import mappers.MapperDto;
 import model.Computer;
-import springconfig.SpringConfig;
+import springconfig.SpringConfigTest;
 import validator.Validator;
 
 /**
@@ -40,7 +40,7 @@ public class ValidatorTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() throws Exception {
-    applicationContext = new AnnotationConfigApplicationContext(SpringConfig.class);
+    applicationContext = new AnnotationConfigApplicationContext(SpringConfigTest.class);
     validator = applicationContext.getBean("validator", Validator.class);
   }
   

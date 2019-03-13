@@ -18,7 +18,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @ComponentScan({"testdao","testmodel","testvalidator","dao","service","servlet","mappers","validator","controller"})
 @PropertySource(value = { "classpath:hikariconfig.properties" })
-public class SpringConfig implements WebApplicationInitializer {
+public class SpringConfigTest implements WebApplicationInitializer {
 
     @Autowired
     private Environment environement;
