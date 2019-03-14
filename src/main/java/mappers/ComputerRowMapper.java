@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import dao.CompanyDaoImpl;
 import model.Computer;
+import service.ServiceCompany;
 
 @Component
 public class ComputerRowMapper
 {
   @Autowired
-  private CompanyDaoImpl companyDao;
+  private ServiceCompany serviceCompany;
   
   public RowMapper<Computer> getRowMapperComputer() {
     return new RowMapper<Computer>() {
@@ -28,10 +28,9 @@ public class ComputerRowMapper
         if (result.getDate("discontinued") != null) {
           computer.setDiscontinued(result.getDate("discontinued"));
         }
-        computer.setCompany(companyDao.getCompany(result.getInt("company_id")));
+        computer.setCompany(serviceCompany.getCompany(result.getInt("company_id")));
         return computer;
       }
     };
   }
-  
 }

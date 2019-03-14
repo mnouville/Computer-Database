@@ -19,7 +19,6 @@
 <body>
 
 	<c:set var="sort" value="${param['sort']}" scope="application"></c:set>
-	
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
@@ -155,7 +154,7 @@
 		            				<li><a href="SortByCompanyName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:otherwise>
-		            				<li><a href="ComputerServlet?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li>
 		            			</c:otherwise>	
 		            		</c:choose>
 						</c:when>

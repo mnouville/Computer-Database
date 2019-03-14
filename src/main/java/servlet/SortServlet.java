@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import model.Computer;
+import dto.Dto;
+import mappers.MapperDto;
 import service.ServiceComputer;
 
 /**
@@ -26,6 +27,9 @@ public class SortServlet extends HttpServlet {
 
   @Autowired
   private ServiceComputer serviceComputer;
+  
+  @Autowired
+  private MapperDto mapper;
 
   @Override
   public void init(ServletConfig config) throws ServletException{
@@ -50,7 +54,7 @@ public class SortServlet extends HttpServlet {
       throws ServletException, IOException {
     try {
       String search = request.getParameter("search");
-      List<Computer> computers = this.serviceComputer.searchName(search);
+      List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.searchName(search));
       request.setAttribute("computers", computers);
       request.setAttribute("maxcomputer", computers.size());
     } catch (SQLException e) {

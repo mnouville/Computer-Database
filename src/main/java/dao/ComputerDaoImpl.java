@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import model.Company;
 import model.Computer;
 
 import org.slf4j.Logger;
@@ -39,13 +37,15 @@ public class ComputerDaoImpl implements ComputerDao {
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
-  private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer";
+  private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
+  private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
   private final String update = "update computer set name = ?, introduced = ? , discontinued = ?, company_id = ? where id = ?";
   private final String delete = "DELETE FROM computer WHERE id = ?";
   private final String get = "SELECT id,name,introduced,discontinued,company_id "
                            + "FROM computer where id = :id";
   private final String maxid = "SELECT MAX(id) FROM computer;";
   private final String count = "SELECT COUNT(id) FROM computer;";
+  private final String sortbycolumn = "SELECT id,name,introduced,discontinued,company_id FROM computer";
   private final String sortcompanyname = "SELECT c.id,c.name,c.introduced,c.discontinued,"
                                        + "c.company_id FROM computer c" 
                                        + " LEFT JOIN company comp on c.company_id = comp.id ";
@@ -98,27 +98,11 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public List<Computer> getComputers() throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " LIMIT 50;");
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOTNamedParameterJdbcTemplate CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(getall, params, rowMapper);
+    return list;
   }
 
   /**
@@ -128,28 +112,12 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public List<Computer> getComputers(int begin) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " LIMIT 50 OFFSET " + begin);
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("offset", begin);
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(getalloffset, params, rowMapper);
+    return list;
   }
 
   /**
@@ -209,67 +177,30 @@ public class ComputerDaoImpl implements ComputerDao {
    * Method that sort all computers by name.
    */
   public List<Computer> searchName(String search) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " where name LIKE '%" + search + "%' LIMIT 50;");
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(sortbycolumn + " where name LIKE '%" + search + "%' LIMIT 50", params, rowMapper);
+    return list;
   }
   
   /**
    * Method that sort all computers by introduced.
    */
-  public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
+  public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {    
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list;
     
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      
-      if (column.equals("company")) {
-        resultat = statement.executeQuery(
-            sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin);
-        
-      } else {
-        resultat = statement.executeQuery(
-            getall + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin);
-      } 
-      
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      
-      LOG.info("Request succesfully executed "
-             + "(GET ALL COMPUTERS SORTED BY " + column + " " + type + ")!");
-      
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
+    if (column.equals("company")) {
+      list = jdbcTemplate.query(
+          sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin, params, rowMapper);
+    } else {
+      list = jdbcTemplate.query(
+          sortbycolumn + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin , params, rowMapper);
     }
     
-    return computers;
+    return list;
   }
 }

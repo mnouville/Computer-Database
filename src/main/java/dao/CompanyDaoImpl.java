@@ -146,6 +146,9 @@ public class CompanyDaoImpl implements CompanyDao {
         String name = resultat.getString("name");
         c = new Company(id, name);
       }
+      if ( c.getId() == 0 ) {
+        c = new Company(0,"");
+      }
       //LOG.info("Request succesfully executed (GET COMPANY)! ");
     } catch (SQLException e) {
       LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
