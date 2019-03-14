@@ -9,19 +9,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="../css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="../css/main.css" rel="stylesheet" media="screen">
-<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="css/main.css" rel="stylesheet" media="screen">
+<link href="<c:url value="/css/bootstrap.min.css"/>" rel="stylesheet" media="screen">
+<link href="<c:url value="/css/font-awesome.css"/>" rel="stylesheet" media="screen">
+<link href="<c:url value="/css/main.css"/>" rel="stylesheet" media="screen">
 </head>
 <body>
 
 	<c:set var="sort" value="${param['sort']}" scope="application"></c:set>
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
+            <a class="navbar-brand" href="<c:url value="/"/>"> Application - Computer Database </a>
         </div>
     </header>
     <section id="main">
@@ -31,7 +28,7 @@
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
-                    <form id="searchForm" action="SortServlet" method="POST" class="form-inline">
+                    <form id="searchForm" action="<c:url value="/Search"/>" method="POST" class="form-inline">
                         <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" />
                         <input type="submit" id="searchsubmit" value="Filter by name"
                         class="btn btn-primary" />
@@ -66,20 +63,20 @@
                         <th style="width:30%;">
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByName?page=${param['page']}&type=ASC&sort=name">Computer name</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=name">Computer name</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByName?page=${param['page']}&type=${type}&sort=name">Computer name</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=name">Computer name</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByIntro?page=${param['page']}&type=ASC&sort=intro">Introduced date</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=introduced">Introduced date</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByIntro?page=${param['page']}&type=${type}&sort=intro">Introduced date</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=introduced">Introduced date</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -87,10 +84,10 @@
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByDisc?page=${param['page']}&type=ASC&sort=disc">Discontinued date</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=discontinued">Discontinued date</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByDisc?page=${param['page']}&type=${type}&sort=disc">Discontinued date</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=discontinued">Discontinued date</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -98,10 +95,10 @@
                         <th style="width:30%;">
                            	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByCompanyName?page=${param['page']}&type=ASC&sort=name">Company</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=company">Company</a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByCompanyName?page=${param['page']}&type=${type}&sort=name">Company</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=company">Company</a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -131,7 +128,7 @@
         <div class="container text-center">
             <ul class="pagination">
                 <li>
-                    <a href="ComputerServlet?page=1" aria-label="Previous">
+                    <a href="<c:url value="/"/>?page=1" aria-label="Previous">
                       <span aria-hidden="true">&laquo;</span>
                 	</a>
 	            </li>
@@ -142,19 +139,19 @@
 		            		<c:set var="page" value="${page + 1}" scope="page"/>
 		            		<c:choose>
 		            			<c:when test="${sort == 'name'}">
-		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'intro'}">
-		            				<li><a href="SortByIntro?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=introduced"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'disc'}">
-		            				<li><a href="SortByDisc?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=discontinued"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'company'}">
-		            				<li><a href="SortByCompanyName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=company"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:otherwise>
-		            				<li><a href="ComputerServlet?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li>
+		            				<li><a href="<c:url value="/"/>?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li>
 		            			</c:otherwise>	
 		            		</c:choose>
 						</c:when>
@@ -171,9 +168,8 @@
             <button type="button" class="btn btn-default">100</button>
         </div>
     </footer>
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/dashboard.js"></script>
-
+<script src="<c:url value="js/jquery.min.js"/>"></script>
+<script src="<c:url value="js/bootstrap.min.js"/>"></script>
+<script src="<c:url value="js/dashboard.js"/>"></script>
 </body>
 </html>

@@ -105,6 +105,7 @@ public class ComputerDaoImpl implements ComputerDao {
   public List<Computer> getComputers(int begin) throws SQLException {
     NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("limit", 50);
     params.addValue("offset", begin);
     RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
     List<Computer> list = jdbcTemplate.query(getalloffset, params, rowMapper);

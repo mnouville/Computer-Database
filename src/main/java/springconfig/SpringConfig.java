@@ -12,7 +12,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -20,7 +24,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @ComponentScan({"dao","service","servlet","mappers","validator","controller"})
 @PropertySource(value = { "classpath:hikariconfig.properties" })
 @EnableWebMvc
-public class SpringConfig implements WebApplicationInitializer {
+public class SpringConfig implements WebApplicationInitializer, WebMvcConfigurer {
 
     @Autowired
     private Environment environement;
@@ -43,5 +47,15 @@ public class SpringConfig implements WebApplicationInitializer {
 
       // Manage the life cycle of the root application context
       container.addListener(new ContextLoaderListener(rootContext));
+    }
+    
+    @Bean
+    public ViewResolver internalResourceViewResolver() {
+      InternalResourceViewResolver bean = new InternalResourceViewResolver();
+      bean.setViewClass(JstlView.class);
+      bean.setPrefix("/WEB-INF/views/");
+      bean.setSuffix(".jsp");
+      
+      return bean;
     }
 }

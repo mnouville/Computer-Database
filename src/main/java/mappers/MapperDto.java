@@ -43,9 +43,6 @@ public class MapperDto {
    * @return Computer
    */
   public Computer dtoToComputer(Dto dto) {
-
-    //this.serviceCompany = ServiceCompanyImpl.getInstance();
-    
     Computer c = new Computer();
     
     try {
