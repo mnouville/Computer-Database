@@ -13,6 +13,8 @@ import model.Company;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -37,6 +39,10 @@ public class CompanyDaoImpl implements CompanyDao {
   @Autowired
   private HikariDataSource dataSource;
 
+  private JdbcTemplate jdbcTemplate;
+  
+  private NamedParameterJdbcTemplate njdbcTemplate;
+  
   /**
    * Method that return the connection of Hikari
    * @return the connection to the database
@@ -58,16 +64,7 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   @Override
   public void addCompany(Company c) throws SQLException {
-    try (Connection connexion = this.getConnection();
-        PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
-      preparedStatement.setInt(1, c.getId());
-      preparedStatement.setString(2, c.getName());
-      preparedStatement.executeUpdate();
-      LOG.info("Request succesfully executed (ADD COMPANY)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
-    }
+    this.jdbcTemplate.update(insert,c.getId(),c.getName());
   }
 
   /**

@@ -1,11 +1,7 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import model.Computer;
@@ -32,8 +28,7 @@ import mappers.ComputerRowMapper;
 @Repository
 public class ComputerDaoImpl implements ComputerDao {
 
-  @Autowired
-  private CompanyDaoImpl companyDao;
+
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
@@ -89,6 +84,7 @@ public class ComputerDaoImpl implements ComputerDao {
   @Override
   public void addComputer(Computer c) throws SQLException {
     this.jdbcTemplate.update(insert,c.getId(),c.getName(),c.getIntroduced(),c.getDiscontinued(),c.getCompany().getId());
+    LOG.info("COMPUTER ADDED");
   }
 
   /**
@@ -102,6 +98,7 @@ public class ComputerDaoImpl implements ComputerDao {
     MapSqlParameterSource params = new MapSqlParameterSource();
     RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
     List<Computer> list = jdbcTemplate.query(getall, params, rowMapper);
+    LOG.info("Request succesfully executed (get computers) size : " + list.size());
     return list;
   }
 
@@ -117,6 +114,7 @@ public class ComputerDaoImpl implements ComputerDao {
     params.addValue("offset", begin);
     RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
     List<Computer> list = jdbcTemplate.query(getalloffset, params, rowMapper);
+    LOG.info("Request succesfully executed (get computers with offset) size : " + list.size());
     return list;
   }
 
@@ -128,6 +126,7 @@ public class ComputerDaoImpl implements ComputerDao {
   @Override
   public void deleteComputer(int id) throws SQLException {
     this.jdbcTemplate.update(delete,Long.valueOf(id));
+    LOG.info("COMPUTER DELETED");
   }
 
   /**
@@ -141,6 +140,7 @@ public class ComputerDaoImpl implements ComputerDao {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("id", i);
     RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    LOG.info("Requested computer : " + i);
     return njdbcTemplate.queryForObject(get, params, rowMapper);
   }
 
@@ -152,6 +152,7 @@ public class ComputerDaoImpl implements ComputerDao {
   @Override
   public void updateComputer(Computer c) throws SQLException {
     this.jdbcTemplate.update(update,c.getName(), c.getIntroduced(), c.getDiscontinued(), c.getCompany().getId(), c.getId());
+    LOG.info("COMPUTER UPDATED");
   }
 
   /**
@@ -161,6 +162,7 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public int getMaxId() throws SQLException {
+    LOG.info("MAX ID requested");
     return this.jdbcTemplate.queryForObject(maxid, Integer.class) + 1;
   }
 
@@ -170,6 +172,7 @@ public class ComputerDaoImpl implements ComputerDao {
    * @return int
    */
   public int getCount() throws SQLException {
+    LOG.info("ROW COUNT requested");
     return this.jdbcTemplate.queryForObject(count, Integer.class);
   }
 
@@ -181,6 +184,7 @@ public class ComputerDaoImpl implements ComputerDao {
     MapSqlParameterSource params = new MapSqlParameterSource();
     RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
     List<Computer> list = jdbcTemplate.query(sortbycolumn + " where name LIKE '%" + search + "%' LIMIT 50", params, rowMapper);
+    LOG.info("Request succesfully executed (sort by a specific name) size : " + list.size());
     return list;
   }
   
@@ -200,7 +204,7 @@ public class ComputerDaoImpl implements ComputerDao {
       list = jdbcTemplate.query(
           sortbycolumn + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin , params, rowMapper);
     }
-    
+    LOG.info("Request succesfully executed (sort by column) size : " + list.size());
     return list;
   }
 }
