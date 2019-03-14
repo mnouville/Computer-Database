@@ -11,7 +11,7 @@ import model.Company;
 @Component
 public class CompanyRowMapper
 { 
-  public RowMapper<Company> getRowMapperComputer() {
+  public RowMapper<Company> getRowMapperCompany() {
     return new RowMapper<Company>() {
       public Company mapRow(ResultSet result, int pRowNum) throws SQLException {
         Company company = new Company();

@@ -8,7 +8,7 @@ import model.Company;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,8 +18,6 @@ import org.springframework.stereotype.Repository;
 import com.zaxxer.hikari.HikariDataSource;
 
 import mappers.CompanyRowMapper;
-
-
 
 /**
  * Class that contains every method concerning Company in the Database.
@@ -33,26 +31,15 @@ public class CompanyDaoImpl implements CompanyDao {
   private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
-  private final String get = "SELECT id,name FROM company where id = ?";
+  private final String get = "SELECT id,name FROM company where id = :id";
   private final String count = "SELECT COUNT(*) from company where id = ?";
   private final String delete = "DELETE FROM company WHERE id = :id";
   private static final String deletecomputer = "DELETE FROM computer WHERE company_id = :id";
   
-  @Autowired
   private HikariDataSource dataSource;
-  
-  @Autowired
   private CompanyRowMapper companyRawMapper;
-
   private JdbcTemplate jdbcTemplate;
-  
   private NamedParameterJdbcTemplate njdbcTemplate;
-  
-  @Autowired
-  public void setDatasource(HikariDataSource ds) {
-    this.jdbcTemplate = new JdbcTemplate(ds);
-    njdbcTemplate = new NamedParameterJdbcTemplate(ds);
-  }
   
   /**
    * Method that return the connection of Hikari
@@ -66,7 +53,12 @@ public class CompanyDaoImpl implements CompanyDao {
    * 
    * @param daoFactory DaoFactory
    */
-  CompanyDaoImpl() { }
+  CompanyDaoImpl(HikariDataSource dataSource, CompanyRowMapper companyRawMapper ) { 
+    this.dataSource = dataSource;
+    this.companyRawMapper = companyRawMapper;
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
+    this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+  }
 
   /**
    * This method take a Company in parameter and add it into the Database.
@@ -87,7 +79,7 @@ public class CompanyDaoImpl implements CompanyDao {
   public List<Company> getCompanies() throws SQLException {
     NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     MapSqlParameterSource params = new MapSqlParameterSource();
-    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperComputer();
+    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperCompany();
     List<Company> list = jdbcTemplate.query(getall, params, rowMapper);
     LOG.info("Request succesfully executed (get companies) size : " + list.size());
     return list;
@@ -125,9 +117,13 @@ public class CompanyDaoImpl implements CompanyDao {
   public Company getCompany(int i) throws SQLException {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("id", i);
-    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperComputer();
+    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperCompany();
     LOG.info("Requested company: " + i);
-    return njdbcTemplate.queryForObject(get, params, rowMapper);
+    try {
+      return njdbcTemplate.queryForObject(get, params, rowMapper);
+    } catch (EmptyResultDataAccessException e) {
+      return new Company(0,"");
+    } 
   }
 
   /**

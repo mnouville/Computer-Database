@@ -8,7 +8,6 @@ import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -45,22 +44,12 @@ public class ComputerDaoImpl implements ComputerDao {
                                        + "c.company_id FROM computer c" 
                                        + " LEFT JOIN company comp on c.company_id = comp.id ";
 
-  @Autowired
+  
   private HikariDataSource dataSource;
-  
-  @Autowired
   private ComputerRowMapper computerRawMapper;
-  
   private JdbcTemplate jdbcTemplate;
-  
   private NamedParameterJdbcTemplate njdbcTemplate;
 
-  @Autowired
-  public void setDatasource(HikariDataSource ds) {
-    this.jdbcTemplate = new JdbcTemplate(ds);
-    njdbcTemplate = new NamedParameterJdbcTemplate(ds);
-  }
-  
   /**
    * Method that return the connection of Hikari
    * @return the connection to the database
@@ -74,7 +63,12 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @param daoFactory DaoFactory
    */
-  ComputerDaoImpl() { }
+  ComputerDaoImpl(HikariDataSource dataSource, ComputerRowMapper computerRawMapper ) { 
+    this.dataSource = dataSource;
+    this.computerRawMapper = computerRawMapper;
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
+    this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+  }
 
   /**
    * This method take a Computer in parameter and add it into the Database.
