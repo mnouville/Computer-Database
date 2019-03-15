@@ -32,7 +32,7 @@ public class CompanyDaoImpl implements CompanyDao {
   private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
   private final String getall = "SELECT id,name FROM company;";
   private final String get = "SELECT id,name FROM company where id = :id";
-  private final String count = "SELECT COUNT(*) from company where id = ?";
+  private final String count = "SELECT COUNT(*) from company where id = ";
   private final String delete = "DELETE FROM company WHERE id = :id";
   private static final String deletecomputer = "DELETE FROM computer WHERE company_id = :id";
   
@@ -118,7 +118,6 @@ public class CompanyDaoImpl implements CompanyDao {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("id", i);
     RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperCompany();
-    LOG.info("Requested company: " + i);
     try {
       return njdbcTemplate.queryForObject(get, params, rowMapper);
     } catch (EmptyResultDataAccessException e) {
@@ -133,7 +132,6 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   @Override
   public boolean companyExist(int id) throws SQLException {
-    LOG.info("ROW COUNT requested");
-    return (this.jdbcTemplate.queryForObject(count, Integer.class) > 0);
+    return ( jdbcTemplate.queryForObject(count + id, Integer.class) > 0);
   }
 }

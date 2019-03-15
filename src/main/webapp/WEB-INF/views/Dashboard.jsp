@@ -35,13 +35,13 @@
                     </form>
                 </div>
                 <div class="pull-right">
-                    <a class="btn btn-success" id="addComputer" href="AddComputerServlet">Add Computer</a> 
+                    <a class="btn btn-success" id="addComputer" href="<c:url value="/AddComputer"/>">Add Computer</a> 
                     <a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();">Edit</a>
                 </div>
             </div>
         </div>
 
-        <form id="deleteForm" action="DeleteComputerServlet" method="POST">
+        <form id="deleteForm" action="<c:url value="/Delete"/>" method="POST">
             <input type="hidden" name="selection" value="">
         </form>
 
@@ -51,7 +51,6 @@
                     <tr>
                         <!-- Variable declarations for passing labels as parameters -->
                         <!-- Table header for Computer Name -->
-
                         <th class="editMode" style="width: 60px; height: 22px;">
                             <input type="checkbox" id="selectall" /> 
                             <span style="vertical-align: top;">
@@ -112,7 +111,7 @@
                             	<input type="checkbox" name="cb" class="cb" value="<c:out value="${c.id}"/>">
 	                        </td>
 	                        <td>
-	                            <a href="EditComputerServlet?id=<c:out value="${c.id}"/>" onclick=""><c:out value="${c.name}" /></a>
+	                            <a href="<c:url value="/EditComputer"/>?id=<c:out value="${c.id}"/>" onclick=""><c:out value="${c.name}" /></a>
 	                        </td>
                             <td><c:out value="${c.introduced}" /></td>
                             <td><c:out value="${c.discontinued}" /></td>

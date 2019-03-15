@@ -2,6 +2,7 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import model.Computer;
@@ -33,7 +34,7 @@ public class ComputerDaoImpl implements ComputerDao {
                                + "VALUES (?,?,?,?,?);";
   private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
   private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
-  private final String update = "update computer set name = ?, introduced = ? , discontinued = ?, company_id = ? where id = ?";
+  private final String update = "update computer set name = :name, introduced = :intro, discontinued = :disc, company_id = :companyid where id = :id";
   private final String delete = "DELETE FROM computer WHERE id = ?";
   private final String get = "SELECT id,name,introduced,discontinued,company_id "
                            + "FROM computer where id = :id";
@@ -146,8 +147,15 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void updateComputer(Computer c) throws SQLException {
-    this.jdbcTemplate.update(update,c.getName(), c.getIntroduced(), c.getDiscontinued(), c.getCompany().getId(), c.getId());
-    LOG.info("COMPUTER UPDATED");
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("name", c.getName());
+    params.addValue("intro", c.getIntroduced()  == null ? null : new Timestamp(c.getIntroduced().getTime()));
+    params.addValue("disc", c.getDiscontinued() == null ? null : new Timestamp(c.getDiscontinued().getTime()));
+    params.addValue("companyid", c.getCompany().getId());
+    params.addValue("id", c.getId());
+    
+    njdbcTemplate.update(update, params);
+    
   }
 
   /**

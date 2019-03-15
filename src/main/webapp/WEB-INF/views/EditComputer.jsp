@@ -15,7 +15,7 @@
 <body>
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
+            <a class="navbar-brand" href="<c:url value="/"/>"> Application - Computer Database </a>
         </div>
     </header>
     <section id="main">
@@ -27,7 +27,7 @@
                     </div>
                     <h1>Edit Computer</h1>
 
-                    <form action="EditComputerServlet" method="POST">
+                    <form action="<c:url value="/EditComputer"/>" method="POST">
                         <input type="hidden" value="<c:out value="${idcomputer}"/>" id="id" name="id"/> 
                         <fieldset>
                             <div class="form-group">
@@ -48,17 +48,13 @@
                                     <option value="0">--</option>
                                     <c:forEach  items="${companies}" var="c" >
                                     	<c:choose>
-                                    	
 	                                    	<c:when test = "${c.id == companyid }">
 									            <option selected value="<c:out value='${c.id}' />"><c:out value="${c.name}" /></option>
 									        </c:when>
-									         
 									        <c:otherwise>
 									            <option value="<c:out value='${c.id}' />"><c:out value="${c.name}" /></option>
 									        </c:otherwise>
-                                    	
                                     	</c:choose>
-				                        
 				                    </c:forEach>
                                 </select>
                             </div>            
@@ -66,7 +62,7 @@
                         <div class="actions pull-right">
                             <input type="submit" value="Edit" class="btn btn-primary">
                             or
-                            <a href="ComputerServlet" class="btn btn-default">Cancel</a>
+                            <a href="<c:url value="/"/>" class="btn btn-default">Cancel</a>
                         </div>
                     </form>
                 </div>

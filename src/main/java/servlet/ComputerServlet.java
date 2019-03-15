@@ -74,9 +74,13 @@ public class ComputerServlet {
   
   @RequestMapping(value = "/Delete")
   public ModelAndView delete(WebRequest request, ModelAndView modelView) throws SQLException {
-      int totalComputer = serviceComputer.getCount();
-      List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.searchName(request.getParameter("search")));
-      modelView.addObject("computers", computers);
+      String[] parts = request.getParameter("selection").split(",");
+      for (int i = 0; i < parts.length; i++) {
+        this.serviceComputer.deleteComputer(Integer.parseInt(parts[i]));
+      }
+      List<Dto> dtos = this.mapper.computersToDtos(this.serviceComputer.getComputers());
+      int totalComputer = this.serviceComputer.getCount();
+      modelView.addObject("computers", dtos);
       modelView.addObject("maxcomputer", totalComputer);
       modelView.setViewName("Dashboard");
       return modelView;
