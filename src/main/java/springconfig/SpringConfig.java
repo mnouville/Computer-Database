@@ -89,7 +89,7 @@ public class SpringConfig implements WebApplicationInitializer, WebMvcConfigurer
     @Bean
     public CookieLocaleResolver localeResolver(){
         CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.FRENCH);
+        localeResolver.setDefaultLocale(Locale.ENGLISH);
         localeResolver.setCookieName("my-locale-cookie");
         localeResolver.setCookieMaxAge(3600);
         return localeResolver;
