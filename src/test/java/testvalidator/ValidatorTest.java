@@ -1,11 +1,21 @@
 package testvalidator;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.SQLException;
+import java.text.ParseException;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import dto.Dto;
+import exceptions.ValidationException;
+import mappers.MapperDto;
+import model.Computer;
+import springconfig.SpringConfigTest;
 import validator.Validator;
 
 /**
@@ -15,76 +25,68 @@ import validator.Validator;
  */
 public class ValidatorTest {
 
-  private Validator validator = new Validator();
+  @Autowired
+  private static Validator validator;
+  
+  @Autowired
+  private MapperDto mapper;
+  
+  private static ApplicationContext applicationContext; 
   
   /**
-   * Method for testing validIntroduced method of validator.java
+   * Sets the up before class.
+   *
+   * @throws Exception the exception
    */
-  @Test
-  public void testValidIntroduced() {
-    
-    String introduced = "10-05-1996";
-    
-    boolean validIntroduced = validator.validIntroduced(introduced);
-    
-    assertEquals(true, validIntroduced);
-    
-    introduced = "1996-05-10";
-    
-    validIntroduced = validator.validIntroduced(introduced);
-    
-    assertEquals(true, validIntroduced);
-    
-    introduced = "UnitTest";
-    
-    validIntroduced = validator.validIntroduced(introduced);
-    
-    assertEquals(false, validIntroduced);
+  @BeforeClass
+  public static void setUpBeforeClass() throws Exception {
+    applicationContext = new AnnotationConfigApplicationContext(SpringConfigTest.class);
+    validator = applicationContext.getBean("validator", Validator.class);
   }
   
-  /**
-   * Method for testing validDiscontinued method of validator.java
-   */
-  @Test
-  public void testValidDiscontinued() {
-    
-    String discontinued = "10-05-1996";
-    
-    boolean validDiscontinued = validator.validDiscontinued(discontinued);
-    
-    assertEquals(true, validDiscontinued);
-    
-    discontinued = "1996-05-10";
-    
-    validDiscontinued = validator.validDiscontinued(discontinued);
-    
-    assertEquals(true, validDiscontinued);
-    
-    discontinued = "UnitTest";
-    
-    validDiscontinued = validator.validDiscontinued(discontinued);
-    
-    assertEquals(false, validDiscontinued);
+  @AfterClass
+  public static void setUpAfterClass() throws Exception {
+    ((ConfigurableApplicationContext)applicationContext).close();
   }
   
-  /**
-   * Method for testing validCompanyId method of validator.java
-   */
-  @Test
-  public void testValidCompanyId() throws SQLException {
+  @Test(expected = ValidationException.class)
+  public void verifyIntroBeforeDisco1() throws ValidationException, ParseException, SQLException {
+    Dto dto = new Dto("1","Name","2019-01-23", "2019-01-15", "1","");
     
-    int companyId = 1;
+    Computer computer = mapper.dtoToComputer(dto);
+    validator.verifyIntroBeforeDisco(computer);
+  }
+  
+  @Test(expected = ValidationException.class)
+  public void verifyIntroBeforeDisco2() throws ValidationException, ParseException, SQLException {
+    Dto dto = new Dto("1","Name","2019-01-15", "2019-01-15", "1","");
     
-    boolean validCompanyId = validator.validCompanyId(companyId);
+    Computer computer = mapper.dtoToComputer(dto);
+    validator.verifyIntroBeforeDisco(computer);
+  }
+  
+  @Test(expected = ValidationException.class)
+  public void verifyIntroBeforeDisco3() throws ValidationException, ParseException, SQLException {
+    Dto dto = new Dto("1","Name","2019-01-16", "2019-01-15", "1","");
     
-    assertEquals(true, validCompanyId);
+    Computer computer = mapper.dtoToComputer(dto);
+    validator.verifyIntroBeforeDisco(computer);
+  }
+  
+  @Test(expected = ValidationException.class)
+  public void verifyIntroBeforeDisco4() throws ValidationException, ParseException, SQLException {
+    Dto dto = new Dto("1","Name","", "2019-01-15", "1","");
     
-    companyId = 10000;
+    Computer computer = mapper.dtoToComputer(dto);
+    validator.verifyIntroBeforeDisco(computer);
+  }
+  
+  @Test(expected = ValidationException.class)
+  public void verifyIntroBeforeDisco5() throws ValidationException, ParseException, SQLException {
+    Dto dto = new Dto("1","Name",null, "2019-01-15", "1","");
     
-    validCompanyId = validator.validCompanyId(companyId);
-    
-    assertEquals(false,validCompanyId);
-    
+    Computer computer = mapper.dtoToComputer(dto);
+    validator.verifyIntroBeforeDisco(computer);
   }
 
 }

@@ -1,23 +1,23 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import model.Computer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import mappers.ComputerRowMapper;
 
 /**
  * Class that contains every method concerning Computer in the Database.
@@ -28,23 +28,28 @@ import com.zaxxer.hikari.HikariDataSource;
 @Repository
 public class ComputerDaoImpl implements ComputerDao {
 
-  @Autowired
-  private CompanyDaoImpl companyDao;
+
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
-  private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer";
-  private final String delete = "DELETE FROM computer WHERE id = ";
+  private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
+  private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
+  private final String update = "update computer set name = :name, introduced = :intro, discontinued = :disc, company_id = :companyid where id = :id";
+  private final String delete = "DELETE FROM computer WHERE id = ?";
   private final String get = "SELECT id,name,introduced,discontinued,company_id "
-                           + "FROM computer where id =";
+                           + "FROM computer where id = :id";
   private final String maxid = "SELECT MAX(id) FROM computer;";
   private final String count = "SELECT COUNT(id) FROM computer;";
+  private final String sortbycolumn = "SELECT id,name,introduced,discontinued,company_id FROM computer";
   private final String sortcompanyname = "SELECT c.id,c.name,c.introduced,c.discontinued,"
                                        + "c.company_id FROM computer c" 
                                        + " LEFT JOIN company comp on c.company_id = comp.id ";
 
-  @Autowired
+  
   private HikariDataSource dataSource;
+  private ComputerRowMapper computerRawMapper;
+  private JdbcTemplate jdbcTemplate;
+  private NamedParameterJdbcTemplate njdbcTemplate;
 
   /**
    * Method that return the connection of Hikari
@@ -59,7 +64,12 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @param daoFactory DaoFactory
    */
-  ComputerDaoImpl() { }
+  ComputerDaoImpl(HikariDataSource dataSource, ComputerRowMapper computerRawMapper ) { 
+    this.dataSource = dataSource;
+    this.computerRawMapper = computerRawMapper;
+    this.jdbcTemplate = new JdbcTemplate(dataSource);
+    this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+  }
 
   /**
    * This method take a Computer in parameter and add it into the Database.
@@ -68,36 +78,8 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void addComputer(Computer c) throws SQLException {
-    try (Connection connexion = this.getConnection();
-        PreparedStatement preparedStatement = connexion.prepareStatement(insert)) {
-      preparedStatement.setInt(1, c.getId());
-      preparedStatement.setString(2, c.getName());
-
-      if (c.getIntroduced() != null) {
-        preparedStatement.setDate(3, new java.sql.Date(c.getIntroduced().getTime()));
-      } else {
-        preparedStatement.setDate(3, null);
-      }
-
-      if (c.getDiscontinued() != null) {
-        preparedStatement.setDate(4, new java.sql.Date(c.getDiscontinued().getTime()));
-      } else {
-        preparedStatement.setDate(4, null);
-      }
-
-      if (c.getCompany().getId() == 0) {
-        preparedStatement.setNull(5, java.sql.Types.INTEGER);
-      } else {
-        preparedStatement.setInt(5, c.getCompany().getId());
-      }
-      
-
-      preparedStatement.executeUpdate();
-      LOG.info("Request succesfully executed (ADD COMPUTER)! ");
-    } catch (SQLException e) {
-      e.printStackTrace();
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-    }
+    this.jdbcTemplate.update(insert,c.getId(),c.getName(),c.getIntroduced(),c.getDiscontinued(),c.getCompany().getId());
+    LOG.info("COMPUTER ADDED");
   }
 
   /**
@@ -107,27 +89,12 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public List<Computer> getComputers() throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " LIMIT 50;");
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(getall, params, rowMapper);
+    LOG.info("Request succesfully executed (get computers) size : " + list.size());
+    return list;
   }
 
   /**
@@ -137,28 +104,14 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public List<Computer> getComputers(int begin) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " LIMIT 50 OFFSET " + begin);
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("limit", 50);
+    params.addValue("offset", begin);
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(getalloffset, params, rowMapper);
+    LOG.info("Request succesfully executed (get computers with offset) size : " + list.size());
+    return list;
   }
 
   /**
@@ -168,14 +121,8 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void deleteComputer(int id) throws SQLException {
-    try (Connection connexion = this.getConnection();
-        PreparedStatement preparedStatement = connexion.prepareStatement(delete + id)) {
-      preparedStatement.executeUpdate();
-      LOG.info("Request succesfully executed (DELETE COMPUTERS)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
+    this.jdbcTemplate.update(delete,Long.valueOf(id));
+    LOG.info("COMPUTER DELETED");
   }
 
   /**
@@ -186,30 +133,11 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public Computer getComputer(int i) throws SQLException {
-    Computer c = new Computer();
-    ResultSet resultat = null;
-
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-
-      resultat = statement.executeQuery(get + i + ";");
-
-      if (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Date introduced = resultat.getDate("introduced");
-        Date discontinued = resultat.getDate("discontinued");
-        int companyid = resultat.getInt("company_id");
-
-        c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(companyid));
-      }
-      LOG.info("Request succesfully executed (GET COMPUTER)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
-    }
-
-    return c;
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("id", i);
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    LOG.info("Requested computer : " + i);
+    return njdbcTemplate.queryForObject(get, params, rowMapper);
   }
 
   /**
@@ -219,49 +147,14 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void updateComputer(Computer c) throws SQLException {
-    String intro;
-    String disc;
-
-    if (c.getIntroduced() == null) {
-      intro = "NULL";
-    } else {
-      intro = "TIMESTAMP('" + new java.sql.Timestamp(c.getIntroduced().getTime()).toString() + "')";
-    }
-
-    if (c.getDiscontinued() == null) {
-      disc = "NULL";
-    } else {
-      disc = "TIMESTAMP('" + new java.sql.Timestamp(c.getDiscontinued().getTime()).toString()
-          + "')";
-    }
-
-    if (c.getCompany().getId() == 0) {
-      try (Connection connexion = this.getConnection();
-          PreparedStatement preparedStatement = connexion
-              .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
-                  + intro + " ,discontinued = " + disc + ", company_id = NULL" + " where id = "
-                  + c.getId() + ";");) {
-        preparedStatement.executeUpdate();
-        LOG.info("Request succesfully executed (UPDATE COMPUTER)! ");
-      } catch (SQLException e) {
-        LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-        e.printStackTrace();
-      }
-    } else {
-      try (Connection connexion = this.getConnection();
-          PreparedStatement preparedStatement = connexion
-              .prepareStatement("update computer set name = '" + c.getName() + "', introduced = "
-                  + intro + " ,discontinued = " + disc + ", company_id = " + c.getCompany().getId()
-                  + " where id = " + c.getId() + ";");) {
-        preparedStatement.executeUpdate();
-        LOG.info("Request succesfully executed (UPDATE COMPUTER)! ");
-      } catch (SQLException e) {
-        LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-        e.printStackTrace();
-      }
-      ;
-    }
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("name", c.getName());
+    params.addValue("intro", c.getIntroduced()  == null ? null : new Timestamp(c.getIntroduced().getTime()));
+    params.addValue("disc", c.getDiscontinued() == null ? null : new Timestamp(c.getDiscontinued().getTime()));
+    params.addValue("companyid", c.getCompany().getId());
+    params.addValue("id", c.getId());
     
+    njdbcTemplate.update(update, params);
     
   }
 
@@ -272,19 +165,8 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public int getMaxId() throws SQLException {
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(maxid);
-      if (resultat.next()) {
-        return resultat.getInt("MAX(id)") + 1;
-      }
-      LOG.info("Request succesfully executed (GET MAX ID)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return 0;
+    LOG.info("MAX ID requested");
+    return this.jdbcTemplate.queryForObject(maxid, Integer.class) + 1;
   }
 
   /**
@@ -293,86 +175,39 @@ public class ComputerDaoImpl implements ComputerDao {
    * @return int
    */
   public int getCount() throws SQLException {
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(count);
-      if (resultat.next()) {
-        return resultat.getInt("COUNT(ID)");
-      }
-      LOG.info("Request succesfully executed (GET COUNT ID)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT ACCESS TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return 0;
+    LOG.info("ROW COUNT requested");
+    return this.jdbcTemplate.queryForObject(count, Integer.class);
   }
 
   /**
    * Method that sort all computers by name.
    */
   public List<Computer> searchName(String search) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      resultat = statement.executeQuery(getall + " where name LIKE '%" + search + "%' LIMIT 50;");
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      LOG.info("Request succesfully executed (GET ALL COMPUTERS SORTED BY NAME)! ");
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
-    }
-    return computers;
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list = jdbcTemplate.query(sortbycolumn + " where name LIKE '%" + search + "%' LIMIT 50", params, rowMapper);
+    LOG.info("Request succesfully executed (sort by a specific name) size : " + list.size());
+    return list;
   }
   
   /**
    * Method that sort all computers by introduced.
    */
-  public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {
-    List<Computer> computers = new ArrayList<Computer>();
-    ResultSet resultat = null;
+  public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {    
+    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
+    List<Computer> list;
     
-    try (Connection connexion = this.getConnection();
-        Statement statement = connexion.createStatement()) {
-      
-      if (column.equals("company")) {
-        resultat = statement.executeQuery(
-            sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin);
-        
-      } else {
-        resultat = statement.executeQuery(
-            getall + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin);
-      } 
-      
-      while (resultat.next()) {
-        Integer id = resultat.getInt("id");
-        String name = resultat.getString("name");
-        Timestamp introduced = resultat.getTimestamp("introduced");
-        Timestamp discontinued = resultat.getTimestamp("discontinued");
-        int idcompany = resultat.getInt("company_id");
-
-        Computer c = new Computer(id, name, introduced, discontinued, companyDao.getCompany(idcompany));
-        computers.add(c);
-      }
-      
-      LOG.info("Request succesfully executed "
-             + "(GET ALL COMPUTERS SORTED BY " + column + " " + type + ")!");
-      
-    } catch (SQLException e) {
-      LOG.error("ERROR COULD NOT CONNECT TO THE DATABASE");
-      e.printStackTrace();
+    if (column.equals("company")) {
+      list = jdbcTemplate.query(
+          sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin, params, rowMapper);
+    } else {
+      list = jdbcTemplate.query(
+          sortbycolumn + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin , params, rowMapper);
     }
-    
-    return computers;
+    LOG.info("Request succesfully executed (sort by column) size : " + list.size());
+    return list;
   }
 }

@@ -23,6 +23,7 @@
 		<spring.version>5.1.4.RELEASE</spring.version>
 		<javax.annotation-api.version>1.2</javax.annotation-api.version>
 		<javax.inject.version>1</javax.inject.version>
+		<javax-validation.version>2.0.1.Final</javax-validation.version>
 	</properties>
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -33,6 +34,16 @@
 	
 	
 	<dependencies>
+		<dependency>
+		    <groupId>javax.validation</groupId>
+		    <artifactId>validation-api</artifactId>
+		    <version>${javax-validation.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-jdbc</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
 		<dependency>
 		    <groupId>org.springframework</groupId>
 		    <artifactId>spring-webmvc</artifactId>

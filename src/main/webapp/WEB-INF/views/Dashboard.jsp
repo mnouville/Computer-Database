@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,43 +11,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="../css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="../css/main.css" rel="stylesheet" media="screen">
-<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="css/main.css" rel="stylesheet" media="screen">
+<link href="resources/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="resources/css/font-awesome.css" rel="stylesheet" media="screen">
+<link href="resources/css/main.css" rel="stylesheet" media="screen">
 </head>
 <body>
 
 	<c:set var="sort" value="${param['sort']}" scope="application"></c:set>
-	
     <header class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="ComputerServlet"> Application - Computer Database </a>
+            <a class="navbar-brand" href="<c:url value="/"/>"><spring:message code="application.title"/></a>
         </div>
     </header>
     <section id="main">
         <div class="container">
             <h1 id="homeTitle">
-                <c:out value="${maxcomputer}" /> Computers found
+            	<spring:message code="dashboard.computersFound" arguments="${maxcomputer}"/>
             </h1>
             <div id="actions" class="form-horizontal">
                 <div class="pull-left">
-                    <form id="searchForm" action="SortServlet" method="POST" class="form-inline">
-                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="Search name" />
-                        <input type="submit" id="searchsubmit" value="Filter by name"
-                        class="btn btn-primary" />
+                    <form id="searchForm" action="<c:url value="/Search"/>" method="POST" class="form-inline">
+                        <input type="search" id="searchbox" name="search" class="form-control" placeholder="<spring:message code="dashboard.searchName"/>" />
+                        <input type="submit" id="searchsubmit" value="<spring:message code="dashboard.searchButton"/>" class="btn btn-primary" />
                     </form>
                 </div>
                 <div class="pull-right">
-                    <a class="btn btn-success" id="addComputer" href="AddComputerServlet">Add Computer</a> 
-                    <a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();">Edit</a>
+                    <a class="btn btn-success" id="addComputer" href="<c:url value="/AddComputer"/>"><spring:message code="dashboard.addComputerButton"/></a> 
+                    <a class="btn btn-default" id="editComputer" href="#" onclick="$.fn.toggleEditMode();"><spring:message code="dashboard.editComputerButton"/></a>
                 </div>
             </div>
         </div>
 
-        <form id="deleteForm" action="DeleteComputerServlet" method="POST">
+        <form id="deleteForm" action="<c:url value="/Delete"/>" method="POST">
             <input type="hidden" name="selection" value="">
         </form>
 
@@ -55,7 +52,6 @@
                     <tr>
                         <!-- Variable declarations for passing labels as parameters -->
                         <!-- Table header for Computer Name -->
-
                         <th class="editMode" style="width: 60px; height: 22px;">
                             <input type="checkbox" id="selectall" /> 
                             <span style="vertical-align: top;">
@@ -67,20 +63,20 @@
                         <th style="width:30%;">
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByName?page=${param['page']}&type=ASC&sort=name">Computer name</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=name"><spring:message code="dashboard.computerNameColumn"/></a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByName?page=${param['page']}&type=${type}&sort=name">Computer name</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=name"><spring:message code="dashboard.computerNameColumn"/></a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByIntro?page=${param['page']}&type=ASC&sort=intro">Introduced date</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=introduced"><spring:message code="dashboard.introducedColumn"/></a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByIntro?page=${param['page']}&type=${type}&sort=intro">Introduced date</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=introduced"><spring:message code="dashboard.introducedColumn"/></a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -88,10 +84,10 @@
                         <th>
                         	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByDisc?page=${param['page']}&type=ASC&sort=disc">Discontinued date</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=discontinued"><spring:message code="dashboard.discontinuedColumn"/></a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByDisc?page=${param['page']}&type=${type}&sort=disc">Discontinued date</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=discontinued"><spring:message code="dashboard.discontinuedColumn"/></a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -99,10 +95,10 @@
                         <th style="width:30%;">
                            	<c:choose>
 				            	<c:when test="${param['type'] == null}">
-									<a href="SortByCompanyName?page=${param['page']}&type=ASC&sort=name">Company</a>
+									<a href="Sort?page=${param['page']}&type=ASC&sort=company"><spring:message code="dashboard.companyColumn"/></a>
 								</c:when>
 								<c:otherwise>
-									<a href="SortByCompanyName?page=${param['page']}&type=${type}&sort=name">Company</a>
+									<a href="Sort?page=${param['page']}&type=${type}&sort=company"><spring:message code="dashboard.companyColumn"/></a>
 								</c:otherwise>
 			            	</c:choose>
                         </th>
@@ -116,7 +112,7 @@
                             	<input type="checkbox" name="cb" class="cb" value="<c:out value="${c.id}"/>">
 	                        </td>
 	                        <td>
-	                            <a href="EditComputerServlet?id=<c:out value="${c.id}"/>" onclick=""><c:out value="${c.name}" /></a>
+	                            <a href="<c:url value="/EditComputer"/>?id=<c:out value="${c.id}"/>" onclick=""><c:out value="${c.name}" /></a>
 	                        </td>
                             <td><c:out value="${c.introduced}" /></td>
                             <td><c:out value="${c.discontinued}" /></td>
@@ -132,7 +128,7 @@
         <div class="container text-center">
             <ul class="pagination">
                 <li>
-                    <a href="ComputerServlet?page=1" aria-label="Previous">
+                    <a href="<c:url value="/"/>?page=1" aria-label="Previous">
                       <span aria-hidden="true">&laquo;</span>
                 	</a>
 	            </li>
@@ -143,19 +139,19 @@
 		            		<c:set var="page" value="${page + 1}" scope="page"/>
 		            		<c:choose>
 		            			<c:when test="${sort == 'name'}">
-		            				<li><a href="SortByName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'intro'}">
-		            				<li><a href="SortByIntro?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=introduced"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'disc'}">
-		            				<li><a href="SortByDisc?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=discontinued"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:when test="${sort == 'company'}">
-		            				<li><a href="SortByCompanyName?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="Sort?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=company"><c:out value="${page}"/></a></li>
 		            			</c:when>
 		            			<c:otherwise>
-		            				<li><a href="ComputerServlet?page=<c:out value='${page}'/>&type=<c:out value="${param['type']}"/>&sort=name"><c:out value="${page}"/></a></li>
+		            				<li><a href="<c:url value="/"/>?page=<c:out value='${page}'/>"><c:out value="${page}"/></a></li>
 		            			</c:otherwise>	
 		            		</c:choose>
 						</c:when>
@@ -172,9 +168,8 @@
             <button type="button" class="btn btn-default">100</button>
         </div>
     </footer>
-<script src="js/jquery.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/dashboard.js"></script>
-
+<script src="resources/js/jquery.min.js"></script>
+<script src="resources/js/bootstrap.min.js"></script>
+<script src="resources/js/dashboard.js"></script>
 </body>
 </html>

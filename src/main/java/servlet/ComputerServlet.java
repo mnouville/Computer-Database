@@ -2,30 +2,26 @@ package servlet;
 
 import dto.Dto;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import mappers.MapperDto;
-import model.Computer;
 import service.ServiceComputer;
 
 /**
  * Servlet implementation class ComputerServlet.
  */
-@WebServlet(name = "ComputerServlet", urlPatterns = { "/ComputerServlet" })
-public class ComputerServlet extends HttpServlet {
-  private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/")
+public class ComputerServlet {
 
   @Autowired
   private ServiceComputer serviceComputer;
@@ -33,48 +29,60 @@ public class ComputerServlet extends HttpServlet {
   @Autowired
   private MapperDto mapper;
   
-  @Override
-  public void init(ServletConfig config) throws ServletException{
-    super.init(config);
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+  
+  @GetMapping
+  public ModelAndView doGet(@RequestParam(value = "page", defaultValue = "1") String pageNumber,
+                            ModelAndView modelView) throws SQLException {
+      int totalComputer = serviceComputer.getCount();
+      int page = Integer.parseInt(pageNumber);
+      List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.getComputers((page - 1) * 50));
+      modelView.addObject("computers", computers);
+      modelView.addObject("maxcomputer", totalComputer);
+      modelView.setViewName("Dashboard");
+      return modelView;
   }
-
-  /**
-   * Method doGet of ComputerServlet.
-   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-   */
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    try {
-      int max = this.serviceComputer.getCount();
-      request.setAttribute("maxcomputer", max);
-      List<Computer> computers;
-      List<Dto> dtos;
-      if (request.getParameter("page") == null || request.getParameter("page") == "1") {
-        computers = this.serviceComputer.getComputers();
-        dtos = this.mapper.computersToDtos(computers);
+  
+  @RequestMapping(value = "/Sort")
+  public ModelAndView sortByName(@RequestParam(value = "page", defaultValue = "1") String pageNumber,
+                                 @RequestParam(value = "type", defaultValue = "ASC") String type,
+                                 @RequestParam(value = "sort", defaultValue = "name") String sort,
+                                 ModelAndView modelView) throws SQLException {
+      int totalComputer = serviceComputer.getCount();
+      int page = Integer.parseInt(pageNumber);
+      int offset = (page - 1) * 50;
+      List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.sortByColumn(type, offset,sort));
+      modelView.addObject("computers", computers);
+      modelView.addObject("maxcomputer", totalComputer);
+      if (type.equals("ASC")) {
+        modelView.addObject("type", "DESC");
       } else {
-        int page = Integer.parseInt(request.getParameter("page"));
-        computers = this.serviceComputer.getComputers((page - 1) * 50);
-        dtos = this.mapper.computersToDtos(computers);
+        modelView.addObject("type", "ASC");
       }
-      request.setAttribute("computers", dtos);
-    } catch (SQLException ex) {
-      // Logger.getLogger(UtilisateursServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-
-    this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,
-        response);
+      modelView.setViewName("Dashboard");
+      return modelView;
   }
-
-  /**
-   * Method doPost of ComputerServlet.
-   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-   */
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    // TODO Auto-generated method stub
-    doGet(request, response);
+  
+  @RequestMapping(value = "/Search")
+  public ModelAndView search(WebRequest request, ModelAndView modelView) throws SQLException {
+      int totalComputer = serviceComputer.getCount();
+      List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.searchName(request.getParameter("search")));
+      modelView.addObject("computers", computers);
+      modelView.addObject("maxcomputer", totalComputer);
+      modelView.setViewName("Dashboard");
+      return modelView;
   }
-
+  
+  @RequestMapping(value = "/Delete")
+  public ModelAndView delete(WebRequest request, ModelAndView modelView) throws SQLException {
+      String[] parts = request.getParameter("selection").split(",");
+      for (int i = 0; i < parts.length; i++) {
+        this.serviceComputer.deleteComputer(Integer.parseInt(parts[i]));
+      }
+      List<Dto> dtos = this.mapper.computersToDtos(this.serviceComputer.getComputers());
+      int totalComputer = this.serviceComputer.getCount();
+      modelView.addObject("computers", dtos);
+      modelView.addObject("maxcomputer", totalComputer);
+      modelView.setViewName("Dashboard");
+      return modelView;
+  }
 }

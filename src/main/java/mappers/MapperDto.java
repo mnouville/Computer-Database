@@ -43,9 +43,6 @@ public class MapperDto {
    * @return Computer
    */
   public Computer dtoToComputer(Dto dto) {
-
-    //this.serviceCompany = ServiceCompanyImpl.getInstance();
-    
     Computer c = new Computer();
     
     try {
@@ -54,15 +51,15 @@ public class MapperDto {
       c.setName(dto.getName());
 
       if (!dto.getIntroduced().equals("")) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date introduced = formatter.parse(dto.getIntroduced());
         c.setIntroduced(introduced);
       }
-
+      
       if (!dto.getDiscontinued().equals("")) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         Date discontinued = formatter.parse(dto.getDiscontinued());
-        c.setIntroduced(discontinued);
+        c.setDiscontinued(discontinued);
       }
 
       if (dto.getCompanyId() != null) {

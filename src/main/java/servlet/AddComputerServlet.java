@@ -1,18 +1,15 @@
 package servlet;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import dto.Dto;
 import exceptions.ValidationException;
@@ -26,9 +23,9 @@ import validator.Validator;
 /**
  * Servlet implementation class AddComputerServlet.
  */
-@WebServlet(name = "AddComputerServlet", urlPatterns = { "/AddComputerServlet" })
-public class AddComputerServlet extends HttpServlet {
-  private static final long serialVersionUID = 1L;
+@Controller
+@RequestMapping("/AddComputer")
+public class AddComputerServlet  {
 
   @Autowired
   private ServiceComputer serviceComputer;
@@ -42,64 +39,40 @@ public class AddComputerServlet extends HttpServlet {
   @Autowired
   private MapperDto mapper;
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+  @GetMapping
+  protected ModelAndView doGet(ModelAndView modelView) throws SQLException {
+    List<Company> companies;
+    companies = this.serviceCompany.getCompanies();
+    modelView.addObject("companies", companies);
+    modelView.setViewName("AddComputer");
+    return modelView;
   }
-
-  /**
-   * Method doGet of AddComputerServlet.
-   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-   */
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
-    try {
-      List<Company> companies;
-      companies = this.serviceCompany.getCompanies();
-      request.setAttribute("companies", companies);
-    } catch (SQLException ex) {
-      // Logger.getLogger(UtilisateursServlet.class.getName()).log(Level.SEVERE, null, ex);
-    }
-
-    this.getServletContext().getRequestDispatcher("/views/AddComputer.jsp").forward(request,
-        response);
-  }
-
-  /**
-   * Method doPost of AddComputerServlet.
-   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-   */
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-      throws ServletException, IOException {
+  
+  @PostMapping
+  protected ModelAndView doPost(WebRequest request, ModelAndView modelView) throws SQLException, ValidationException {
     Company comp;
     int companyid = Integer.parseInt(request.getParameter("companyid"));
-    try {
-      validator.verifyValidCompanyId(companyid);
-      comp = this.serviceCompany.getCompany(Integer.parseInt(request.getParameter("companyid")));
-      Dto dto = new Dto(this.serviceComputer.getMaxId()+"",
-                        request.getParameter("name"), 
-                        request.getParameter("introduced"), 
-                        request.getParameter("discontinued"), 
-                        comp.getId()+"", comp.getName() );
-      
-      Computer computer = mapper.dtoToComputer(dto);
-      this.validator.verifyComputerNotNull(computer);
-      this.validator.verifyIdNotNull(computer.getId());
-      this.validator.verifyName(computer.getName());
-      this.validator.verifyIntroBeforeDisco(computer);
-      this.serviceComputer.addComputer(computer);
-      int max = this.serviceComputer.getCount();
-      request.setAttribute("maxcomputer", max);
-      request.setAttribute("computers", this.mapper.computersToDtos(
-                                        this.serviceComputer.getComputers()));
-      
-      this.getServletContext().getRequestDispatcher("/views/Dashboard.jsp").forward(request,
-          response);
-    } catch (ValidationException e) {
-      request.setAttribute("error", e.getMessage());
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+    
+    validator.verifyValidCompanyId(companyid);
+    comp = this.serviceCompany.getCompany(Integer.parseInt(request.getParameter("companyid")));
+    Dto dto = new Dto(this.serviceComputer.getMaxId()+"",
+                      request.getParameter("name"), 
+                      request.getParameter("introduced"), 
+                      request.getParameter("discontinued"), 
+                      comp.getId()+"", comp.getName() );
+    
+    Computer computer = mapper.dtoToComputer(dto);
+    this.validator.verifyComputerNotNull(computer);
+    this.validator.verifyIdNotNull(computer.getId());
+    this.validator.verifyName(computer.getName());
+    this.validator.verifyIntroBeforeDisco(computer);
+    this.serviceComputer.addComputer(computer);
+    
+    int totalComputer = this.serviceComputer.getCount();
+    List<Dto> computers = this.mapper.computersToDtos(this.serviceComputer.getComputers());
+    modelView.addObject("computers", computers);
+    modelView.addObject("maxcomputer", totalComputer);
+    modelView.setViewName("Dashboard");
+    return modelView;
   }
 }
