@@ -7,6 +7,10 @@ import java.util.List;
 
 import model.Computer;
 
+import org.hibernate.query.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,8 +36,8 @@ public class ComputerDaoImpl implements ComputerDao {
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
   private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
                                + "VALUES (?,?,?,?,?);";
-  private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
-  private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
+  //private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
+  //private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
   private final String update = "update computer set name = :name, introduced = :intro, discontinued = :disc, company_id = :companyid where id = :id";
   private final String delete = "DELETE FROM computer WHERE id = ?";
   private final String get = "SELECT id,name,introduced,discontinued,company_id "
@@ -50,6 +54,7 @@ public class ComputerDaoImpl implements ComputerDao {
   private ComputerRowMapper computerRawMapper;
   private JdbcTemplate jdbcTemplate;
   private NamedParameterJdbcTemplate njdbcTemplate;
+  private SessionFactory sessionFactory;
 
   /**
    * Method that return the connection of Hikari
@@ -64,9 +69,10 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @param daoFactory DaoFactory
    */
-  ComputerDaoImpl(HikariDataSource dataSource, ComputerRowMapper computerRawMapper ) { 
+  ComputerDaoImpl(HikariDataSource dataSource, ComputerRowMapper computerRawMapper, SessionFactory sessionFactory ) { 
     this.dataSource = dataSource;
     this.computerRawMapper = computerRawMapper;
+    this.sessionFactory = sessionFactory;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
     this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
   }
@@ -78,7 +84,20 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void addComputer(Computer c) throws SQLException {
-    this.jdbcTemplate.update(insert,c.getId(),c.getName(),c.getIntroduced(),c.getDiscontinued(),c.getCompany().getId());
+    Session session = this.sessionFactory.openSession();
+    Transaction tx = session.getTransaction();
+    try {
+      tx = session.beginTransaction();
+      session.saveOrUpdate(c);        
+      tx.commit();
+    } catch (Exception e) {
+        if (tx != null) {
+            tx.rollback();
+        }
+        e.printStackTrace();
+    } finally {
+        session.close();
+    }  
     LOG.info("COMPUTER ADDED");
   }
 
@@ -89,12 +108,10 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public List<Computer> getComputers() throws SQLException {
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
-    List<Computer> list = jdbcTemplate.query(getall, params, rowMapper);
-    LOG.info("Request succesfully executed (get computers) size : " + list.size());
-    return list;
+    Session session = this.sessionFactory.openSession();
+    @SuppressWarnings("unchecked")
+    List<Computer> result = (List<Computer>) session.createQuery("from Computer").list();
+    return result;
   }
 
   /**
@@ -102,16 +119,16 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @return List of Objects Computer
    */
+  @SuppressWarnings("unchecked")
   @Override
   public List<Computer> getComputers(int begin) throws SQLException {
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("limit", 50);
-    params.addValue("offset", begin);
-    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
-    List<Computer> list = jdbcTemplate.query(getalloffset, params, rowMapper);
-    LOG.info("Request succesfully executed (get computers with offset) size : " + list.size());
-    return list;
+    Session session = this.sessionFactory.openSession();
+    Query<Computer> qry;
+    qry = session.createQuery("FROM Computer");
+    qry.setMaxResults(50);
+    qry.setFirstResult(begin);
+    List<Computer> result = (List<Computer>) qry.list();
+    return result;
   }
 
   /**

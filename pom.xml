@@ -24,6 +24,9 @@
 		<javax.annotation-api.version>1.2</javax.annotation-api.version>
 		<javax.inject.version>1</javax.inject.version>
 		<javax-validation.version>2.0.1.Final</javax-validation.version>
+		<hibernate-core.version>5.4.1.Final</hibernate-core.version>
+		<javassist.version>3.18.2-GA</javassist.version>
+		<spring-orm.version>4.0.3.RELEASE</spring-orm.version>
 	</properties>
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -34,6 +37,31 @@
 	
 	
 	<dependencies>
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjtools</artifactId>
+		    <version>1.9.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjweaver</artifactId>
+		    <version>1.9.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-orm</artifactId>
+		    <version>${spring.version}</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.hibernate</groupId>
+		   <artifactId>hibernate-core</artifactId>
+		   <version>${hibernate-core.version}</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.javassist</groupId>
+		   <artifactId>javassist</artifactId>
+		   <version>${javassist.version}</version>
+		</dependency>
 		<dependency>
 		    <groupId>javax.validation</groupId>
 		    <artifactId>validation-api</artifactId>

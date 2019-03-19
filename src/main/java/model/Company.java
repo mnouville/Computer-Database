@@ -1,15 +1,27 @@
 package model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Class for Object Company.
  * 
  * @author mnouville
  * @version 1.0
  */
-public class Company {
+@Entity
+@Table(name = "company")
+public class Company implements java.io.Serializable{
 
+  private static final long serialVersionUID = 1L;
   private int id;
   private String name;
+  private Set<Computer> computers = new HashSet<Computer>(0);
 
   /**
    * Constructor of the Class Company.
@@ -22,6 +34,12 @@ public class Company {
     this.setName(name);
   }
 
+  public Company(int id, String name, Set<Computer> computers) {
+    this.id = id;
+    this.name = name;
+    this.computers = computers;
+ }
+  
   /**
    * Empty Constructor of Company.
    */
@@ -34,6 +52,8 @@ public class Company {
    * 
    * @return int that correspond to the id of a Company
    */
+  @Id 
+  @Column(name="id", unique=true, nullable=false)
   public int getId() {
     return id;
   }
@@ -52,6 +72,7 @@ public class Company {
    * 
    * @return String that correspond to the name of a Company
    */
+  @Column(name="name")
   public String getName() {
     return name;
   }
@@ -76,6 +97,11 @@ public class Company {
     String s = "";
     s += "ID : " + this.id + "\t" + this.name;
     return s;
+  }
+ 
+  
+  public void setComputers(Set<Computer> computers) {
+      this.computers = computers;
   }
   
   /**
