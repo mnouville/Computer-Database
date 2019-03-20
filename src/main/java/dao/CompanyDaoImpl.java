@@ -5,19 +5,18 @@ import java.sql.SQLException;
 import java.util.List;
 
 import model.Company;
+import model.Computer;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.TransactionException;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.HikariDataSource;
-
-import mappers.CompanyRowMapper;
 
 /**
  * Class that contains every method concerning Company in the Database.
@@ -29,17 +28,15 @@ import mappers.CompanyRowMapper;
 public class CompanyDaoImpl implements CompanyDao {
 
   private static final Logger LOG = LoggerFactory.getLogger(CompanyDaoImpl.class);
-  private final String insert = "INSERT INTO company(id,name) VALUES (?,?);";
-  private final String getall = "SELECT id,name FROM company;";
-  private final String get = "SELECT id,name FROM company where id = :id";
-  private final String count = "SELECT COUNT(*) from company where id = ";
-  private final String delete = "DELETE FROM company WHERE id = :id";
-  private static final String deletecomputer = "DELETE FROM computer WHERE company_id = :id";
+  private final String getall = "FROM Company";
+  private final String get = "from Company where id = :id";
+  private final String count = "SELECT COUNT(id) FROM Company";
+  private final String delete = "DELETE Company where id = :id";
+  private static final String deletecomputer = "DELETE Computer WHERE company_id = :id";
   
   private HikariDataSource dataSource;
-  private CompanyRowMapper companyRawMapper;
-  private JdbcTemplate jdbcTemplate;
-  private NamedParameterJdbcTemplate njdbcTemplate;
+  private SessionFactory sessionFactory;
+  private Session session;
   
   /**
    * Method that return the connection of Hikari
@@ -53,13 +50,18 @@ public class CompanyDaoImpl implements CompanyDao {
    * 
    * @param daoFactory DaoFactory
    */
-  CompanyDaoImpl(HikariDataSource dataSource, CompanyRowMapper companyRawMapper ) { 
+  CompanyDaoImpl(HikariDataSource dataSource, SessionFactory sessionFactory ) { 
     this.dataSource = dataSource;
-    this.companyRawMapper = companyRawMapper;
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
-    this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    this.sessionFactory = sessionFactory;
+    this.session = this.sessionFactory.openSession();
   }
 
+  public void validateSession() {
+    if(!this.session.isOpen()) {
+      this.session = this.sessionFactory.openSession();
+    }
+  }
+  
   /**
    * This method take a Company in parameter and add it into the Database.
    * 
@@ -67,7 +69,24 @@ public class CompanyDaoImpl implements CompanyDao {
    */
   @Override
   public void addCompany(Company c) throws SQLException {
-    this.jdbcTemplate.update(insert,c.getId(),c.getName());
+    validateSession();
+    Transaction tx = this.session.getTransaction();
+    
+    try {
+      tx = session.beginTransaction();
+      session.saveOrUpdate(c);        
+      tx.commit();
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);;
+      }
+      hibernateException.printStackTrace();
+    } finally {
+        session.close();
+    }  
+    LOG.info("COMPUTER ADDED");
   }
 
   /**
@@ -75,14 +94,12 @@ public class CompanyDaoImpl implements CompanyDao {
    * 
    * @return List of Object Company
    */
+  @SuppressWarnings("unchecked")
   @Override
   public List<Company> getCompanies() throws SQLException {
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperCompany();
-    List<Company> list = jdbcTemplate.query(getall, params, rowMapper);
-    LOG.info("Request succesfully executed (get companies) size : " + list.size());
-    return list;
+    validateSession();
+    List<Company> result = (List<Company>) this.session.createQuery(getall).list();
+    return result;
   }
 
   /**
@@ -90,21 +107,32 @@ public class CompanyDaoImpl implements CompanyDao {
    * 
    * @param id int
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void deleteCompany(int id) throws SQLException {    
-    MapSqlParameterSource parameters = new MapSqlParameterSource();
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    parameters.addValue("id", id);
+    validateSession();
+    Transaction tx = this.session.getTransaction();
     
-    if(jdbcTemplate.update(deletecomputer, parameters) == 0) {
-      LOG.info("Impossible to delete computer with the following company ID : " + id);
-    }
-    
-    if(jdbcTemplate.update(delete, parameters) == 0) {
-      LOG.info("Impossible to delete company with the following ID : " + id);
-    }
-    
-    LOG.info("COMPANY DELETED");
+    try {
+      tx = this.session.beginTransaction();
+      Query<Computer> query = this.session.createQuery(deletecomputer);
+      query.setParameter("id", id);
+      query.executeUpdate();
+      query = this.session.createQuery(delete);
+      query.setParameter("id", id);
+      query.executeUpdate();
+      tx.commit();
+      LOG.info("COMPANY DELETED");
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+          LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
+    } finally {
+      this.session.close();
+    }  
   }
 
   /**
@@ -113,16 +141,30 @@ public class CompanyDaoImpl implements CompanyDao {
    * @param i int
    * @return Object Company
    */
+  @SuppressWarnings("unchecked")
   @Override
   public Company getCompany(int i) throws SQLException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("id", i);
-    RowMapper<Company> rowMapper = this.companyRawMapper.getRowMapperCompany();
+    validateSession();
+    Transaction tx = this.session.getTransaction();
+    
     try {
-      return njdbcTemplate.queryForObject(get, params, rowMapper);
-    } catch (EmptyResultDataAccessException e) {
-      return new Company(0,"");
-    } 
+      tx = this.session.beginTransaction();
+      Query<Company> query = this.session.createQuery(get);
+      query.setParameter("id", i);
+      List<Company> result = (List<Company>) query.list();
+      return result.get(0);
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
+    } finally {
+      this.session.close();
+    }  
+    
+    return null;
   }
 
   /**
@@ -130,8 +172,12 @@ public class CompanyDaoImpl implements CompanyDao {
    * 
    * @return boolean
    */
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean companyExist(int id) throws SQLException {
-    return ( jdbcTemplate.queryForObject(count + id, Integer.class) > 0);
+    LOG.info("ROW COUNT requested");
+    validateSession();
+    Query query = this.session.createQuery(count);
+    return (Integer.parseInt(query.list().get(0).toString())>0);
   }
 }

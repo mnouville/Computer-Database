@@ -87,7 +87,7 @@ public class ComputerDaoImpl implements ComputerDao {
       try {
         tx.rollback();
       } catch(RuntimeException runtimeEx){
-          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
       }
       hibernateException.printStackTrace();
     } finally {
@@ -147,7 +147,7 @@ public class ComputerDaoImpl implements ComputerDao {
       try {
         tx.rollback();
       } catch(RuntimeException runtimeEx){
-          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
       }
       hibernateException.printStackTrace();
     } finally {
@@ -177,7 +177,7 @@ public class ComputerDaoImpl implements ComputerDao {
       try {
         tx.rollback();
       } catch(RuntimeException runtimeEx){
-          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
       }
       hibernateException.printStackTrace();
     } finally {
@@ -212,7 +212,7 @@ public class ComputerDaoImpl implements ComputerDao {
       try {
         tx.rollback();
       } catch(RuntimeException runtimeEx){
-          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+        LOG.error("Couldn’t Roll Back Transaction", runtimeEx);
       }
       hibernateException.printStackTrace();
     } finally {
