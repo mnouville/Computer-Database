@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.TransactionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -82,9 +83,13 @@ public class ComputerDaoImpl implements ComputerDao {
       tx = session.beginTransaction();
       session.saveOrUpdate(c);        
       tx.commit();
-    } catch (Exception e) {
-        if (tx != null) tx.rollback();
-        e.printStackTrace();
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
     } finally {
         session.close();
     }  
@@ -138,11 +143,13 @@ public class ComputerDaoImpl implements ComputerDao {
       query.setParameter("id", id);
       query.executeUpdate();
       tx.commit();
-    } catch (Exception e) {
-        if (tx != null) {
-            tx.rollback();
-        }
-        e.printStackTrace();
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
     } finally {
       this.session.close();
     }  
@@ -166,9 +173,13 @@ public class ComputerDaoImpl implements ComputerDao {
       query.setParameter("id", i);
       List<Computer> result = (List<Computer>) query.list();
       return result.get(0);
-    } catch (Exception e) {
-        if (tx != null) tx.rollback();
-        e.printStackTrace();
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
     } finally {
       this.session.close();
     }  
@@ -197,9 +208,13 @@ public class ComputerDaoImpl implements ComputerDao {
       query.setParameter("id", c.getId());
       query.executeUpdate();
       tx.commit();
-    } catch (Exception e) {
-        if (tx != null) tx.rollback();
-        e.printStackTrace();
+    } catch (TransactionException hibernateException) {
+      try {
+        tx.rollback();
+      } catch(RuntimeException runtimeEx){
+          System.err.printf("Couldn’t Roll Back Transaction", runtimeEx);
+      }
+      hibernateException.printStackTrace();
     } finally {
       this.session.close();
     }  
