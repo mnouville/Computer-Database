@@ -76,4 +76,12 @@ public class Validator {
       throw new ValidationException("the computer is null");
     }
   }
+  
+  public void verifyComputer(Computer c) throws ValidationException, SQLException {
+    this.verifyIdNotNull(c.getId());
+    this.verifyName(c.getName());
+    this.verifyIntroBeforeDisco(c);
+    this.verifyComputerNotNull(c);
+    this.verifyValidCompanyId(c.getCompany().getId());
+  }
 }

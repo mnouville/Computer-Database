@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import model.Computer;
 
@@ -28,6 +29,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param c Computer
    */
   @Override
+  @Transactional
   public void addComputer(Computer c) throws SQLException {
     this.computerDao.addComputer(c);
   }
@@ -38,6 +40,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param id int
    */
   @Override
+  @Transactional
   public void deleteComputer(int id) throws SQLException {
     this.computerDao.deleteComputer(id);
   }
@@ -48,6 +51,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param c Computer
    */
   @Override
+  @Transactional
   public void updateComputer(Computer c) throws SQLException {
     this.computerDao.updateComputer(c);
   }
@@ -58,6 +62,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param id int
    */
   @Override
+  @Transactional
   public Computer getComputer(int id) throws SQLException {
     Computer c = this.computerDao.getComputer(id);
 
@@ -68,6 +73,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * Method for having the list of every Computers in the Database.
    */
   @Override
+  @Transactional
   public List<Computer> getComputers() throws SQLException {
     List<Computer> list = this.computerDao.getComputers();
 
@@ -80,6 +86,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param begin int
    */
   @Override
+  @Transactional
   public List<Computer> getComputers(int begin) throws SQLException {
     return this.computerDao.getComputers(begin);
   }
@@ -88,6 +95,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * Method for having the max Id in the database.
    */
   @Override
+  @Transactional
   public int getMaxId() throws SQLException {
     return this.computerDao.getMaxId();
   }
@@ -96,6 +104,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * Method that return the number of computers.
    */
   @Override
+  @Transactional
   public int getCount() throws SQLException {
     return this.computerDao.getCount();
   }
@@ -105,6 +114,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param search String
    */
   @Override
+  @Transactional
   public List<Computer> searchName(String search) throws SQLException {
     return this.computerDao.searchName(search);
   }
@@ -115,6 +125,7 @@ public class ServiceComputerImpl implements ServiceComputer {
    * @param begin int
    * @return List of computers
    */
+  @Transactional
   public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {
     return this.computerDao.sortByColumn(type, begin, column);
   }

@@ -13,10 +13,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -34,27 +30,18 @@ public class ComputerDaoImpl implements ComputerDao {
 
 
   private static final Logger LOG = LoggerFactory.getLogger(ComputerDaoImpl.class);
-  private final String insert = "INSERT INTO computer(id,name,introduced,discontinued,company_id) "
-                               + "VALUES (?,?,?,?,?);";
-  //private final String getall = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT 50";
-  //private final String getalloffset = "SELECT id,name,introduced,discontinued,company_id FROM computer LIMIT :limit OFFSET :offset";
-  private final String update = "update computer set name = :name, introduced = :intro, discontinued = :disc, company_id = :companyid where id = :id";
-  private final String delete = "DELETE FROM computer WHERE id = ?";
-  private final String get = "SELECT id,name,introduced,discontinued,company_id "
-                           + "FROM computer where id = :id";
-  private final String maxid = "SELECT MAX(id) FROM computer;";
-  private final String count = "SELECT COUNT(id) FROM computer;";
-  private final String sortbycolumn = "SELECT id,name,introduced,discontinued,company_id FROM computer";
-  private final String sortcompanyname = "SELECT c.id,c.name,c.introduced,c.discontinued,"
-                                       + "c.company_id FROM computer c" 
-                                       + " LEFT JOIN company comp on c.company_id = comp.id ";
+  private final String getall = "FROM Computer";
+  private final String update = "update Computer set name = :name, introduced = :intro, discontinued = :disc, company_id = :companyid where id = :id";
+  private final String delete = "delete Computer where id = :id";
+  private final String get = "from Computer where id = :id";
+  private final String maxid = "SELECT MAX(id) FROM Computer";
+  private final String count = "SELECT COUNT(id) FROM Computer";
+  private final String searchname = "from Computer where name like ";
+  private final String sortcompanyname = "SELECT cpu FROM Computer cpu LEFT JOIN Company cpa on cpu.company = cpa.id ";
 
-  
   private HikariDataSource dataSource;
-  private ComputerRowMapper computerRawMapper;
-  private JdbcTemplate jdbcTemplate;
-  private NamedParameterJdbcTemplate njdbcTemplate;
   private SessionFactory sessionFactory;
+  private Session session;
 
   /**
    * Method that return the connection of Hikari
@@ -71,10 +58,14 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   ComputerDaoImpl(HikariDataSource dataSource, ComputerRowMapper computerRawMapper, SessionFactory sessionFactory ) { 
     this.dataSource = dataSource;
-    this.computerRawMapper = computerRawMapper;
     this.sessionFactory = sessionFactory;
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
-    this.njdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+    this.session = this.sessionFactory.openSession();
+  }
+  
+  public void validateSession() {
+    if(!this.session.isOpen()) {
+      this.session = this.sessionFactory.openSession();
+    }
   }
 
   /**
@@ -84,16 +75,15 @@ public class ComputerDaoImpl implements ComputerDao {
    */
   @Override
   public void addComputer(Computer c) throws SQLException {
-    Session session = this.sessionFactory.openSession();
-    Transaction tx = session.getTransaction();
+    validateSession();
+    Transaction tx = this.session.getTransaction();
+    
     try {
       tx = session.beginTransaction();
       session.saveOrUpdate(c);        
       tx.commit();
     } catch (Exception e) {
-        if (tx != null) {
-            tx.rollback();
-        }
+        if (tx != null) tx.rollback();
         e.printStackTrace();
     } finally {
         session.close();
@@ -106,11 +96,11 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @return List of Objects Computer
    */
+  @SuppressWarnings("unchecked")
   @Override
   public List<Computer> getComputers() throws SQLException {
-    Session session = this.sessionFactory.openSession();
-    @SuppressWarnings("unchecked")
-    List<Computer> result = (List<Computer>) session.createQuery("from Computer").list();
+    validateSession();
+    List<Computer> result = (List<Computer>) this.session.createQuery(getall).list();
     return result;
   }
 
@@ -122,12 +112,12 @@ public class ComputerDaoImpl implements ComputerDao {
   @SuppressWarnings("unchecked")
   @Override
   public List<Computer> getComputers(int begin) throws SQLException {
-    Session session = this.sessionFactory.openSession();
-    Query<Computer> qry;
-    qry = session.createQuery("FROM Computer");
-    qry.setMaxResults(50);
-    qry.setFirstResult(begin);
-    List<Computer> result = (List<Computer>) qry.list();
+    validateSession();
+    Query<Computer> query;
+    query = this.session.createQuery(getall);
+    query.setMaxResults(50);
+    query.setFirstResult(begin);
+    List<Computer> result = (List<Computer>) query.list();
     return result;
   }
 
@@ -136,10 +126,26 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @param id int
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void deleteComputer(int id) throws SQLException {
-    this.jdbcTemplate.update(delete,Long.valueOf(id));
-    LOG.info("COMPUTER DELETED");
+    validateSession();
+    Transaction tx = this.session.getTransaction();
+    
+    try {
+      tx = this.session.beginTransaction();
+      Query<Computer> query = this.session.createQuery(delete);
+      query.setParameter("id", id);
+      query.executeUpdate();
+      tx.commit();
+    } catch (Exception e) {
+        if (tx != null) {
+            tx.rollback();
+        }
+        e.printStackTrace();
+    } finally {
+      this.session.close();
+    }  
   }
 
   /**
@@ -148,13 +154,26 @@ public class ComputerDaoImpl implements ComputerDao {
    * @param i int
    * @return an object Computer
    */
+  @SuppressWarnings("unchecked")
   @Override
   public Computer getComputer(int i) throws SQLException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("id", i);
-    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
-    LOG.info("Requested computer : " + i);
-    return njdbcTemplate.queryForObject(get, params, rowMapper);
+    validateSession();
+    Transaction tx = this.session.getTransaction();
+    
+    try {
+      tx = this.session.beginTransaction();
+      Query<Computer> query = this.session.createQuery(get);
+      query.setParameter("id", i);
+      List<Computer> result = (List<Computer>) query.list();
+      return result.get(0);
+    } catch (Exception e) {
+        if (tx != null) tx.rollback();
+        e.printStackTrace();
+    } finally {
+      this.session.close();
+    }  
+    
+    return null;
   }
 
   /**
@@ -162,16 +181,28 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @param c Computer
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void updateComputer(Computer c) throws SQLException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("name", c.getName());
-    params.addValue("intro", c.getIntroduced()  == null ? null : new Timestamp(c.getIntroduced().getTime()));
-    params.addValue("disc", c.getDiscontinued() == null ? null : new Timestamp(c.getDiscontinued().getTime()));
-    params.addValue("companyid", c.getCompany().getId());
-    params.addValue("id", c.getId());
+    validateSession();
+    Transaction tx = this.session.getTransaction();
     
-    njdbcTemplate.update(update, params);
+    try {
+      tx = this.session.beginTransaction();
+      Query<Computer> query = this.session.createQuery(update);
+      query.setParameter("name", c.getName());
+      query.setParameter("intro", c.getIntroduced()  == null ? null : new Timestamp(c.getIntroduced().getTime()));
+      query.setParameter("disc", c.getDiscontinued() == null ? null : new Timestamp(c.getDiscontinued().getTime()));
+      query.setParameter("companyid", c.getCompany().getId());
+      query.setParameter("id", c.getId());
+      query.executeUpdate();
+      tx.commit();
+    } catch (Exception e) {
+        if (tx != null) tx.rollback();
+        e.printStackTrace();
+    } finally {
+      this.session.close();
+    }  
     
   }
 
@@ -180,10 +211,14 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @return Int that correspond to the Max Id
    */
+  
+  @SuppressWarnings("rawtypes")
   @Override
   public int getMaxId() throws SQLException {
     LOG.info("MAX ID requested");
-    return this.jdbcTemplate.queryForObject(maxid, Integer.class) + 1;
+    validateSession();
+    Query query = this.session.createQuery(maxid);
+    return Integer.parseInt(query.list().get(0).toString())+1;
   }
 
   /**
@@ -191,40 +226,44 @@ public class ComputerDaoImpl implements ComputerDao {
    * 
    * @return int
    */
+  @SuppressWarnings("rawtypes")
   public int getCount() throws SQLException {
     LOG.info("ROW COUNT requested");
-    return this.jdbcTemplate.queryForObject(count, Integer.class);
+    validateSession();
+    Query query = this.session.createQuery(count);
+    return Integer.parseInt(query.list().get(0).toString());
   }
 
   /**
    * Method that sort all computers by name.
    */
+  @SuppressWarnings("unchecked")
   public List<Computer> searchName(String search) throws SQLException {
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
-    List<Computer> list = jdbcTemplate.query(sortbycolumn + " where name LIKE '%" + search + "%' LIMIT 50", params, rowMapper);
-    LOG.info("Request succesfully executed (sort by a specific name) size : " + list.size());
-    return list;
+    validateSession();
+    Query<Computer> query;
+    query = this.session.createQuery(searchname + "'%" + search + "%'");
+    List<Computer> result = (List<Computer>) query.list();
+    return result;
   }
   
   /**
    * Method that sort all computers by introduced.
    */
+  @SuppressWarnings("unchecked")
   public List<Computer> sortByColumn(String type, int begin, String column) throws SQLException {    
-    NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    RowMapper<Computer> rowMapper = this.computerRawMapper.getRowMapperComputer();
-    List<Computer> list;
+    validateSession();
+    Query<Computer> query;
     
     if (column.equals("company")) {
-      list = jdbcTemplate.query(
-          sortcompanyname + "order by ISNULL(comp.name),comp.name " + type + " LIMIT 50 OFFSET " + begin, params, rowMapper);
+      query = this.session.createQuery(sortcompanyname + " order by ISNULL(cpa.name),cpa.name " + type);
     } else {
-      list = jdbcTemplate.query(
-          sortbycolumn + " order by " + column + " " + type + " LIMIT 50 OFFSET " + begin , params, rowMapper);
+      query = this.session.createQuery(getall + " order by " + column + " " + type);
     }
-    LOG.info("Request succesfully executed (sort by column) size : " + list.size());
-    return list;
+    
+    query.setMaxResults(50);
+    query.setFirstResult(begin);
+    List<Computer> result = (List<Computer>) query.list();
+    LOG.info("Request succesfully executed (sort by column) size : " + result.size());
+    return result;
   }
 }

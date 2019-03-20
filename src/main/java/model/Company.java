@@ -1,11 +1,12 @@
 package model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -21,7 +22,9 @@ public class Company implements java.io.Serializable{
   private static final long serialVersionUID = 1L;
   private int id;
   private String name;
-  private Set<Computer> computers = new HashSet<Computer>(0);
+  
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "company")
+  private List<Computer> computers;
 
   /**
    * Constructor of the Class Company.
@@ -33,12 +36,6 @@ public class Company implements java.io.Serializable{
     this.setId(id);
     this.setName(name);
   }
-
-  public Company(int id, String name, Set<Computer> computers) {
-    this.id = id;
-    this.name = name;
-    this.computers = computers;
- }
   
   /**
    * Empty Constructor of Company.
@@ -100,9 +97,6 @@ public class Company implements java.io.Serializable{
   }
  
   
-  public void setComputers(Set<Computer> computers) {
-      this.computers = computers;
-  }
   
   /**
    * HashCode Method for Company Object.

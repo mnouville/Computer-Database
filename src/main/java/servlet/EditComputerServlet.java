@@ -1,6 +1,7 @@
 package servlet;
 
 import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,12 +43,12 @@ public class EditComputerServlet {
   @GetMapping
   protected ModelAndView doGet(WebRequest request, ModelAndView modelView) throws SQLException {
     int id = Integer.parseInt(request.getParameter("id"));
-    Computer c = this.serviceComputer.getComputer(id);
+    Computer computer = this.serviceComputer.getComputer(id);
     modelView.addObject("idcomputer", id);
-    modelView.addObject("name", c.getName());
-    modelView.addObject("introduced", c.getIntroduced());
-    modelView.addObject("discontinued", c.getDiscontinued());
-    modelView.addObject("companyid", c.getCompany().getId());
+    modelView.addObject("name", computer.getName());
+    modelView.addObject("introduced", computer.getIntroduced()  == null ? null : computer.getIntroduced().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+    modelView.addObject("discontinued", computer.getIntroduced()  == null ? null : computer.getDiscontinued().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+    modelView.addObject("companyid", computer.getCompany().getId());
     List<Company> companies;
     companies = this.serviceCompany.getCompanies();
     modelView.addObject("companies", companies);
