@@ -1,6 +1,7 @@
 package controller;
 
 import dnl.utils.text.table.TextTable;
+import exceptions.ValidationException;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import service.ServiceCompany;
 import service.ServiceComputer;
+import validator.Validator;
 //import springconfig.SpringConfig;
 import view.View;
 
@@ -39,6 +41,9 @@ public class Controller {
   @Autowired
   private ServiceCompany serviceCompany;
   
+  @Autowired
+  private Validator validator;
+  
   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
   private View view;
   private Scanner sc;
@@ -48,8 +53,9 @@ public class Controller {
    * Main of the class Controller.
    * 
    * @param args String[]
+   * @throws ValidationException 
    */
-  public static void main(String[] args) throws SQLException {
+  public static void main(String[] args) throws SQLException, ValidationException {
       Controller ctrl = new Controller();
       ctrl.launchMenu();
   }
@@ -66,9 +72,10 @@ public class Controller {
 
   /**
    * Method that display in console the Main Menu of the application.
+   * @throws ValidationException 
    * 
    */
-  public void launchMenu() throws SQLException {
+  public void launchMenu() throws SQLException, ValidationException {
     this.getView().displayMenu();
 
     sc = new Scanner(System.in);
@@ -91,9 +98,10 @@ public class Controller {
 
   /**
    * Method that display in console the Company Menu.
+   * @throws ValidationException 
    * 
    */
-  public void launchMenuCompany() throws SQLException {
+  public void launchMenuCompany() throws SQLException, ValidationException {
     this.getView().displayMenuCompany();
     sc = new Scanner(System.in);
     String choice = sc.nextLine().toUpperCase();
@@ -129,8 +137,9 @@ public class Controller {
   
   /**
    * Method that display in console the delete menu for companies.
+   * @throws ValidationException 
    */
-  public void deleteCompany() throws SQLException {
+  public void deleteCompany() throws SQLException, ValidationException {
     System.out.print("Enter Company ID : ");
     Scanner sc = new Scanner(System.in);
     int companyid = Integer.parseInt(sc.nextLine());
@@ -141,9 +150,10 @@ public class Controller {
 
   /**
    * Method that display in console the Computer Menu.
+   * @throws ValidationException 
    * 
    */
-  public void launchMenuComputer() throws SQLException {
+  public void launchMenuComputer() throws SQLException, ValidationException {
     this.getView().displayMenuComputer();
     sc = new Scanner(System.in);
     String choice = sc.nextLine().toUpperCase();
@@ -180,9 +190,10 @@ public class Controller {
 
   /**
    * Method that display in console menu for the addition of a new Computer Menu.
+   * @throws ValidationException 
    * 
    */
-  public void addComputer() throws SQLException {
+  public void addComputer() throws SQLException, ValidationException {
     System.out.print("Enter Name : ");
     Scanner sc = new Scanner(System.in);
     String name = sc.nextLine();
@@ -225,16 +236,11 @@ public class Controller {
         Computer c = new Computer(this.serviceComputer.getMaxId(), name, ts1, ts2,
             this.serviceCompany.getCompany(companyid));
         // check if all informations are valid
-        if (c.validComputer()) {
-          LOG.info("Computer Add Request : " + c.toString());
-          this.serviceComputer.addComputer(c);
-          this.getView().computerAdded();
-          launchMenuComputer();
-        } else {
-          LOG.error("Invalid Datas : " + c.toString());
-          this.getView().invalidDatas();
-          addComputer();
-        }
+        this.validator.verifyComputer(c);
+        LOG.info("Computer Add Request : " + c.toString());
+        this.serviceComputer.addComputer(c);
+        this.getView().computerAdded();
+        launchMenuComputer();
       } else {
         LOG.error("The following Company Does not exist : " + companyid);
         this.getView().companyDoesNotExist();
@@ -249,9 +255,10 @@ public class Controller {
 
   /**
    * Method that display the suppresion of a Computer Menu.
+   * @throws ValidationException 
    * 
    */
-  public void deleteComputer() throws SQLException {
+  public void deleteComputer() throws SQLException, ValidationException {
     System.out.print("Enter Computer ID : ");
     Scanner sc = new Scanner(System.in);
     try {
@@ -269,9 +276,10 @@ public class Controller {
 
   /**
    * Method that display the update of computer Menu.
+   * @throws ValidationException 
    * 
    */
-  public void updateComputer() throws SQLException {
+  public void updateComputer() throws SQLException, ValidationException {
     System.out.print("Select a computer ID : ");
     Scanner sc = new Scanner(System.in);
     // check if the value is an integer
@@ -320,16 +328,12 @@ public class Controller {
           Computer c = new Computer(i, name, ts1, ts2,
               this.serviceCompany.getCompany(companyid));
           // check if all informations are valid
-          if (c.validComputer()) {
-            LOG.info("Request update Computer : " + c.getId() + " with datas : " + c.toString());
-            this.serviceComputer.updateComputer(c);
-            this.getView().computerUpdated();
-            launchMenuComputer();
-          } else {
-            LOG.error("Invalid Datas : " + c.toString());
-            this.getView().invalidDatas();
-            updateComputer();
-          }
+          this.validator.verifyComputer(c);
+          LOG.info("Request update Computer : " + c.getId() + " with datas : " + c.toString());
+          this.serviceComputer.updateComputer(c);
+          this.getView().computerUpdated();
+          launchMenuComputer();
+          
         } else {
           LOG.error("The following Company Does not exist : " + companyid);
           this.getView().companyDoesNotExist();
@@ -348,9 +352,10 @@ public class Controller {
 
   /**
    * Method that display a unique Computer by Id.
+   * @throws ValidationException 
    * 
    */
-  public void getComputer() throws SQLException {
+  public void getComputer() throws SQLException, ValidationException {
     System.out.print("Enter computer ID : ");
     Scanner sc = new Scanner(System.in);
     try {
@@ -368,9 +373,10 @@ public class Controller {
 
   /**
    * Method that display every computers in the console.
+   * @throws ValidationException 
    * 
    */
-  public void getComputers() throws SQLException {
+  public void getComputers() throws SQLException, ValidationException {
     LOG.info("Request Computers List");
     List<Computer> computers = this.serviceComputer.getComputers();
     Object[][] data = new Object[computers.size()][5];

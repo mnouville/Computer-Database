@@ -1,15 +1,30 @@
 package model;
 
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 /**
  * Class for Object Company.
  * 
  * @author mnouville
  * @version 1.0
  */
-public class Company {
+@Entity
+@Table(name = "company")
+public class Company implements java.io.Serializable{
 
+  private static final long serialVersionUID = 1L;
   private int id;
   private String name;
+  
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "company")
+  private List<Computer> computers;
 
   /**
    * Constructor of the Class Company.
@@ -21,7 +36,7 @@ public class Company {
     this.setId(id);
     this.setName(name);
   }
-
+  
   /**
    * Empty Constructor of Company.
    */
@@ -34,6 +49,8 @@ public class Company {
    * 
    * @return int that correspond to the id of a Company
    */
+  @Id 
+  @Column(name="id", unique=true, nullable=false)
   public int getId() {
     return id;
   }
@@ -52,6 +69,7 @@ public class Company {
    * 
    * @return String that correspond to the name of a Company
    */
+  @Column(name="name")
   public String getName() {
     return name;
   }
@@ -77,6 +95,8 @@ public class Company {
     s += "ID : " + this.id + "\t" + this.name;
     return s;
   }
+ 
+  
   
   /**
    * HashCode Method for Company Object.

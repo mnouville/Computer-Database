@@ -3,14 +3,27 @@ package model;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 /**
  * Class for Objects Computer.
  * 
  * @author mnouville
  * @version 1.0
  */
-public class Computer {
+@Entity
+@Table(name = "computer")
+public class Computer implements java.io.Serializable {
 
+  private static final long serialVersionUID = 1L;
   private int id;
   private String name;
   private Date introduced;
@@ -60,37 +73,15 @@ public class Computer {
   /**
    * Empty Constructor for the class Computer.
    */
-  public Computer() {
-
-  }
-
-  /**
-   * Method that check if the computer has valid attributes like a true name and consistent Date.
-   * 
-   * @return Boolean
-   */
-  public boolean validComputer() {
-    boolean valid = false;
-    if (this.getIntroduced() != null && this.getDiscontinued() != null) {
-      if (this.getIntroduced().before(this.getDiscontinued())) {
-        valid = true;
-      } else {
-        return false;
-      }
-    }
-    if (this.getName().equals("")) {
-      return false;
-    } else {
-      valid = true;
-    }
-    return valid;
-  }
+  public Computer() { }
 
   /**
    * Getter of Computer, return the id of a Computer.
    * 
    * @return int that correspond to the id of the Computer
    */
+  @Id   
+  @Column(name="id", unique=true, nullable=false)
   public int getId() {
     return id;
   }
@@ -109,6 +100,7 @@ public class Computer {
    * 
    * @return String that correspond to the name of the Computer
    */
+  @Column(name="name")
   public String getName() {
     return name;
   }
@@ -127,6 +119,8 @@ public class Computer {
    * 
    * @return Date
    */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="introduced", length=19)
   public Date getIntroduced() {
     return introduced;
   }
@@ -145,6 +139,8 @@ public class Computer {
    * 
    * @return Date
    */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name="discontinued", length=19)
   public Date getDiscontinued() {
     return discontinued;
   }
@@ -163,34 +159,15 @@ public class Computer {
    * 
    * @return Int that correspond to the Company Id
    */
+  @ManyToOne(fetch=FetchType.LAZY)
+  @JoinColumn(name="company_id")
   public Company getCompany() {
-    return company;
+      return this.company;
   }
-
-  /**
-   * Setter of Computer, set manually the Company Id of a Computer.
-   * 
-   * @param c Company
-   */
-  public void setCompany(Company c) {
-    this.company = c;
+  
+  public void setCompany(Company company) {
+      this.company = company;
   }
-
-  /**
-   * Override Method Equals from Computer.
-   * 
-   * @param c Computer
-   * @return boolean
-   */
-  /*public boolean equals(Computer c) {
-    if (this.id == c.getId() && this.name.equals(c.getName())
-        && this.introduced.equals(c.getIntroduced())
-        && this.discontinued.equals(c.getDiscontinued()) && this.company.equals(c.getCompany())) {
-      return true;
-    } else {
-      return false;
-    }
-  }*/
 
   /**
    * toString method for the class Computer Have different utilities for the View part and for
