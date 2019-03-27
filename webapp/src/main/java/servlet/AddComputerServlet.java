@@ -21,7 +21,7 @@ import service.ServiceComputer;
 import validator.Validator;
 
 /**
- * Servlet implementation class AddComputerServlet.
+ * Servlet implementation class AddComputerServlet. 
  */
 @Controller
 @RequestMapping("/AddComputer")
